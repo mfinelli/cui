@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -15,6 +16,7 @@ type cuiRequest struct {
 func sendRequest(req cuiRequest, cui *cuiApp) error {
 	client := &http.Client{}
 	cui.ResponseBody.Clear()
+	cui.ResponseHeaders.Clear()
 
 	r, err := http.NewRequest(req.Method, req.URL, nil)
 	if err != nil {
@@ -32,7 +34,11 @@ func sendRequest(req cuiRequest, cui *cuiApp) error {
 		return nil
 	}
 
+	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d", res.StatusCode))
 	cui.ResponseBody.SetText(string(body)).ScrollToBeginning()
+
+	cui.ResponseHeaders.SetCell(0, 0, tview.NewTableCell("Header"))
+	cui.ResponseHeaders.SetCell(0, 1, tview.NewTableCell("Value"))
 
 	i := 1
 	for k, v := range res.Header {

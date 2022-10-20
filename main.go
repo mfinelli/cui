@@ -13,6 +13,8 @@ type cuiApp struct {
 	MethodDropdown *tview.DropDown
 	UrlInput *tview.InputField
 
+	Response *tview.Flex
+	ResponseStatus *tview.TextView
 	ResponseBody *tview.TextView
 	ResponseHeaders *tview.Table
 }
@@ -35,6 +37,8 @@ func main() {
 		Footer: tview.NewTextView(),
 		MethodDropdown: tview.NewDropDown(),
 		UrlInput: tview.NewInputField(),
+		Response: tview.NewFlex(),
+		ResponseStatus: tview.NewTextView(),
 		ResponseBody: tview.NewTextView(),
 		ResponseHeaders: tview.NewTable(),
 	}
@@ -44,21 +48,22 @@ func main() {
 		URL: "http://example.com",
 	}
 
-	cui.Footer.SetText(" (q) quit  (m) set method  (u) set url")
+	setInstructions(&cui, "")
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
-
-	cui.ResponseHeaders.SetCell(0, 0, tview.NewTableCell("Header"))
-	cui.ResponseHeaders.SetCell(0, 1, tview.NewTableCell("Value"))
 
 	methodAndUrl := tview.NewFlex().
 		AddItem(cui.MethodDropdown, 10, 0, false).
 		AddItem(cui.UrlInput, 0, 1, false)
 
+	cui.Response.SetDirection(tview.FlexRow).
+		AddItem(cui.ResponseStatus, 1, 0, false).
+		AddItem(cui.ResponseBody, 0, 1, false)
+
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
 		AddItem(tview.NewTextView().SetText("request"), 0, 1, false).
-		AddItem(cui.ResponseHeaders, 0, 1, false)
+		AddItem(cui.Response, 0, 1, false)
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
 
