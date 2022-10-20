@@ -22,7 +22,7 @@ func main() {
 	methodGet := 2 // methods is zero-indexed
 
 	methodDropdown := tview.NewDropDown().SetOptions(methods, nil).SetCurrentOption(methodGet)
-	urlInput := tview.NewInputField().SetLabel("URL: ")
+	urlInput := tview.NewInputField().SetLabel("URL: ").SetPlaceholder("http://example.com")
 
 	methodAndUrl := tview.NewFlex().
 		AddItem(methodDropdown, 10, 0, false).
@@ -46,9 +46,30 @@ func main() {
 		AddItem(inner, 0, 1, false).
 		AddItem(tview.NewTextView().SetText(" (q) quit  (m) set method  (u) set url"), 1, 0, false)
 
+	methodDropdown.SetDoneFunc(func(key tcell.Key) {
+		// methodDropdown.Blur()
+		app.SetFocus(main)
+	})
+	methodDropdown.SetSelectedFunc(func(text string, index int) {
+		// methodDropdown.Blur()
+		app.SetFocus(main)
+	})
+	urlInput.SetDoneFunc(func(key tcell.Key) {
+		// urlInput.Blur()
+		app.SetFocus(main)
+	})
+
+	// fmt.Printf("%s: %d", string('x'), int('x'))
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Rune() == 113 { // q
-			app.Stop()
+		if app.GetFocus() == main { // we're not focused on anything
+			if event.Rune() == 113 { // q
+				app.Stop()
+			} else if event.Rune() == 109 { // m
+				app.SetFocus(methodDropdown)
+			} else if event.Rune() == 117 { // u
+				app.SetFocus(urlInput)
+				return nil
+			}
 		}
 
 		return event
