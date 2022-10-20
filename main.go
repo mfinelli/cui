@@ -10,6 +10,11 @@ import (
 func main() {
 	app := tview.NewApplication()
 
+	req := cuiRequest{
+		Method: http.MethodGet,
+		URL: "http://example.com",
+	}
+
 	methods := []string{
 		http.MethodDelete,
 		http.MethodHead,
@@ -28,10 +33,12 @@ func main() {
 		AddItem(methodDropdown, 10, 0, false).
 		AddItem(urlInput, 0, 1, false)
 
+	respBody := tview.NewTextView()
+
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
 		AddItem(tview.NewTextView().SetText("request"), 0, 1, false).
-		AddItem(tview.NewTextView().SetText("response"), 0, 1, false)
+		AddItem(respBody.SetText("response"), 0, 1, false)
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
 
@@ -47,16 +54,16 @@ func main() {
 		AddItem(tview.NewTextView().SetText(" (q) quit  (m) set method  (u) set url"), 1, 0, false)
 
 	methodDropdown.SetDoneFunc(func(key tcell.Key) {
-		// methodDropdown.Blur()
 		app.SetFocus(main)
+		_, req.Method = methodDropdown.GetCurrentOption()
 	})
 	methodDropdown.SetSelectedFunc(func(text string, index int) {
-		// methodDropdown.Blur()
 		app.SetFocus(main)
+		_, req.Method = methodDropdown.GetCurrentOption()
 	})
 	urlInput.SetDoneFunc(func(key tcell.Key) {
-		// urlInput.Blur()
 		app.SetFocus(main)
+		req.URL = urlInput.GetText()
 	})
 
 	// fmt.Printf("%s: %d", string('x'), int('x'))
@@ -69,6 +76,10 @@ func main() {
 			} else if event.Rune() == 117 { // u
 				app.SetFocus(urlInput)
 				return nil
+			} else if event.Key() == tcell.KeyEnter {
+				if err := sendRequest(req, respBody); err != nil {
+					panic(err)
+				}
 			}
 		}
 
