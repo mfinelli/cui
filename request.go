@@ -34,10 +34,6 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 		return nil
 	}
 
-	cui.Response.Clear().SetDirection(tview.FlexRow).
-		AddItem(cui.ResponseStatus, 1, 0, false).
-		AddItem(cui.ResponseBody, 0, 1, true)
-
 	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d", res.StatusCode))
 	cui.ResponseBody.SetText(string(body)).ScrollToBeginning()
 

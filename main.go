@@ -22,6 +22,7 @@ type cuiApp struct {
 func main() {
 	app := tview.NewApplication()
 	hasResponse := false
+	responseView := "body"
 
 	methods := []string{
 		http.MethodDelete,
@@ -59,7 +60,7 @@ func main() {
 
 	cui.Response.SetDirection(tview.FlexRow).
 		AddItem(cui.ResponseStatus, 1, 0, false).
-		AddItem(cui.ResponseBody, 0, 1, false)
+		AddItem(cui.ResponseBody, 0, 1, true)
 
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
@@ -109,7 +110,11 @@ func main() {
 				app.SetFocus(cui.UrlInput)
 				return nil
 			} else if event.Rune() == 114 && hasResponse { // r
-				setInstructions(&cui, "ResponseBody")
+				if responseView == "body" {
+					setInstructions(&cui, "ResponseBody")
+				} else {
+					setInstructions(&cui, "ResponseHeaders")
+				}
 				app.SetFocus(cui.Response)
 			} else if event.Key() == tcell.KeyEnter {
 				if err := sendRequest(req, &cui, &hasResponse); err != nil {
@@ -117,6 +122,7 @@ func main() {
 				}
 
 				setInstructions(&cui, "ResponseBody")
+				responseView = "body"
 				app.SetFocus(cui.Response)
 			}
 		}
@@ -126,15 +132,15 @@ func main() {
 				setInstructions(&cui, "WithResponse")
 				app.SetFocus(main)
 			} else if event.Rune() == 116 { // t
-				// setInstructions(&cui, "ResponseHeaders")
-				setInstructions(&cui, "WithResponse")
-
-				app.SetFocus(main)
+				setInstructions(&cui, "ResponseHeaders")
+				responseView = "headers"
 
 				cui.Response.Clear().SetDirection(tview.FlexRow).
 					AddItem(cui.ResponseHeaders, 0, 1, true)
 
-				// app.SetFocus(cui.Response)
+				app.SetFocus(cui.Response)
+
+				return nil
 			}
 
 		}
@@ -144,16 +150,16 @@ func main() {
 				setInstructions(&cui, "WithResponse")
 				app.SetFocus(main)
 			} else if event.Rune() == 116 { // t
-				// setInstructions(&cui, "ResponseBody")
-				setInstructions(&cui, "WithResponse")
-
-				app.SetFocus(main)
+				setInstructions(&cui, "ResponseBody")
+				responseView = "body"
 
 				cui.Response.Clear().SetDirection(tview.FlexRow).
 					AddItem(cui.ResponseStatus, 1, 0, false).
 					AddItem(cui.ResponseBody, 0, 1, true)
 
-				// app.SetFocus(cui.Response)
+				app.SetFocus(cui.Response)
+
+				return nil
 			}
 		}
 
