@@ -14,6 +14,7 @@ type cuiApp struct {
 	UrlInput *tview.InputField
 
 	ResponseBody *tview.TextView
+	ResponseHeaders *tview.Table
 }
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 		MethodDropdown: tview.NewDropDown(),
 		UrlInput: tview.NewInputField(),
 		ResponseBody: tview.NewTextView(),
+		ResponseHeaders: tview.NewTable(),
 	}
 
 	req := cuiRequest{
@@ -46,6 +48,9 @@ func main() {
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 
+	cui.ResponseHeaders.SetCell(0, 0, tview.NewTableCell("Header"))
+	cui.ResponseHeaders.SetCell(0, 1, tview.NewTableCell("Value"))
+
 	methodAndUrl := tview.NewFlex().
 		AddItem(cui.MethodDropdown, 10, 0, false).
 		AddItem(cui.UrlInput, 0, 1, false)
@@ -53,7 +58,7 @@ func main() {
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
 		AddItem(tview.NewTextView().SetText("request"), 0, 1, false).
-		AddItem(cui.ResponseBody.SetText("response"), 0, 1, false)
+		AddItem(cui.ResponseHeaders, 0, 1, false)
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
 
