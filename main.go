@@ -7,13 +7,17 @@ import (
 	"github.com/rivo/tview"
 )
 
+type cuiApp struct {
+	Footer *tview.TextView
+
+	MethodDropdown *tview.DropDown
+	UrlInput *tview.InputField
+
+	ResponseBody *tview.TextView
+}
+
 func main() {
 	app := tview.NewApplication()
-
-	req := cuiRequest{
-		Method: http.MethodGet,
-		URL: "http://example.com",
-	}
 
 	methods := []string{
 		http.MethodDelete,
@@ -26,19 +30,30 @@ func main() {
 	}
 	methodGet := 2 // methods is zero-indexed
 
-	methodDropdown := tview.NewDropDown().SetOptions(methods, nil).SetCurrentOption(methodGet)
-	urlInput := tview.NewInputField().SetLabel("URL: ").SetPlaceholder("http://example.com")
+	cui := cuiApp {
+		Footer: tview.NewTextView(),
+		MethodDropdown: tview.NewDropDown(),
+		UrlInput: tview.NewInputField(),
+		ResponseBody: tview.NewTextView(),
+	}
+
+	req := cuiRequest{
+		Method: http.MethodGet,
+		URL: "http://example.com",
+	}
+
+	cui.Footer.SetText(" (q) quit  (m) set method  (u) set url")
+	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
+	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 
 	methodAndUrl := tview.NewFlex().
-		AddItem(methodDropdown, 10, 0, false).
-		AddItem(urlInput, 0, 1, false)
-
-	respBody := tview.NewTextView()
+		AddItem(cui.MethodDropdown, 10, 0, false).
+		AddItem(cui.UrlInput, 0, 1, false)
 
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
 		AddItem(tview.NewTextView().SetText("request"), 0, 1, false).
-		AddItem(respBody.SetText("response"), 0, 1, false)
+		AddItem(cui.ResponseBody.SetText("response"), 0, 1, false)
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
 
@@ -51,19 +66,23 @@ func main() {
 	main := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
 		AddItem(inner, 0, 1, false).
-		AddItem(tview.NewTextView().SetText(" (q) quit  (m) set method  (u) set url"), 1, 0, false)
+		AddItem(cui.Footer, 1, 0, false)
 
-	methodDropdown.SetDoneFunc(func(key tcell.Key) {
+	cui.MethodDropdown.SetDoneFunc(func(key tcell.Key) {
+		// TODO: this leaves the dropdown focused...
 		app.SetFocus(main)
-		_, req.Method = methodDropdown.GetCurrentOption()
+		setInstructions(&cui, "")
+		_, req.Method = cui.MethodDropdown.GetCurrentOption()
 	})
-	methodDropdown.SetSelectedFunc(func(text string, index int) {
+	cui.MethodDropdown.SetSelectedFunc(func(text string, index int) {
 		app.SetFocus(main)
-		_, req.Method = methodDropdown.GetCurrentOption()
+		setInstructions(&cui, "")
+		_, req.Method = cui.MethodDropdown.GetCurrentOption()
 	})
-	urlInput.SetDoneFunc(func(key tcell.Key) {
+	cui.UrlInput.SetDoneFunc(func(key tcell.Key) {
 		app.SetFocus(main)
-		req.URL = urlInput.GetText()
+		setInstructions(&cui, "")
+		req.URL = cui.UrlInput.GetText()
 	})
 
 	// fmt.Printf("%s: %d", string('x'), int('x'))
@@ -72,12 +91,14 @@ func main() {
 			if event.Rune() == 113 { // q
 				app.Stop()
 			} else if event.Rune() == 109 { // m
-				app.SetFocus(methodDropdown)
+				setInstructions(&cui, "MethodDropdown")
+				app.SetFocus(cui.MethodDropdown)
 			} else if event.Rune() == 117 { // u
-				app.SetFocus(urlInput)
+				setInstructions(&cui, "UrlInput")
+				app.SetFocus(cui.UrlInput)
 				return nil
 			} else if event.Key() == tcell.KeyEnter {
-				if err := sendRequest(req, respBody); err != nil {
+				if err := sendRequest(req, &cui); err != nil {
 					panic(err)
 				}
 			}

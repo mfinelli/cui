@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/rivo/tview"
+	// "github.com/rivo/tview"
 )
 
 type cuiRequest struct {
@@ -12,8 +12,9 @@ type cuiRequest struct {
 	URL string
 }
 
-func sendRequest(req cuiRequest, prim *tview.TextView) error {
+func sendRequest(req cuiRequest, cui *cuiApp) error {
 	client := &http.Client{}
+	cui.ResponseBody.Clear()
 
 	r, err := http.NewRequest(req.Method, req.URL, nil)
 	if err != nil {
@@ -31,7 +32,7 @@ func sendRequest(req cuiRequest, prim *tview.TextView) error {
 		return nil
 	}
 
-	prim.SetText(string(body))
+	cui.ResponseBody.SetText(string(body)).ScrollToBeginning()
 
 	return nil
 }
