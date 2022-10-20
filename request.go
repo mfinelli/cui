@@ -13,7 +13,7 @@ type cuiRequest struct {
 	URL    string
 }
 
-func sendRequest(req cuiRequest, cui *cuiApp) error {
+func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 	client := &http.Client{}
 	cui.ResponseBody.Clear()
 	cui.ResponseHeaders.Clear()
@@ -34,6 +34,10 @@ func sendRequest(req cuiRequest, cui *cuiApp) error {
 		return nil
 	}
 
+	cui.Response.Clear().SetDirection(tview.FlexRow).
+		AddItem(cui.ResponseStatus, 1, 0, false).
+		AddItem(cui.ResponseBody, 0, 1, true)
+
 	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d", res.StatusCode))
 	cui.ResponseBody.SetText(string(body)).ScrollToBeginning()
 
@@ -48,6 +52,8 @@ func sendRequest(req cuiRequest, cui *cuiApp) error {
 			i += 1
 		}
 	}
+
+	*hasResponse = true
 
 	return nil
 }

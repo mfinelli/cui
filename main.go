@@ -21,6 +21,7 @@ type cuiApp struct {
 
 func main() {
 	app := tview.NewApplication()
+	hasResponse := false
 
 	methods := []string{
 		http.MethodDelete,
@@ -107,10 +108,52 @@ func main() {
 				setInstructions(&cui, "UrlInput")
 				app.SetFocus(cui.UrlInput)
 				return nil
+			} else if event.Rune() == 114 && hasResponse { // r
+				setInstructions(&cui, "ResponseBody")
+				app.SetFocus(cui.Response)
 			} else if event.Key() == tcell.KeyEnter {
-				if err := sendRequest(req, &cui); err != nil {
+				if err := sendRequest(req, &cui, &hasResponse); err != nil {
 					panic(err)
 				}
+
+				setInstructions(&cui, "ResponseBody")
+				app.SetFocus(cui.Response)
+			}
+		}
+
+		if app.GetFocus() == cui.ResponseBody {
+			if event.Rune() == 113 { // q
+				setInstructions(&cui, "WithResponse")
+				app.SetFocus(main)
+			} else if event.Rune() == 116 { // t
+				// setInstructions(&cui, "ResponseHeaders")
+				setInstructions(&cui, "WithResponse")
+
+				app.SetFocus(main)
+
+				cui.Response.Clear().SetDirection(tview.FlexRow).
+					AddItem(cui.ResponseHeaders, 0, 1, true)
+
+				// app.SetFocus(cui.Response)
+			}
+
+		}
+
+		if app.GetFocus() == cui.ResponseHeaders {
+			if event.Rune() == 113 { // q
+				setInstructions(&cui, "WithResponse")
+				app.SetFocus(main)
+			} else if event.Rune() == 116 { // t
+				// setInstructions(&cui, "ResponseBody")
+				setInstructions(&cui, "WithResponse")
+
+				app.SetFocus(main)
+
+				cui.Response.Clear().SetDirection(tview.FlexRow).
+					AddItem(cui.ResponseStatus, 1, 0, false).
+					AddItem(cui.ResponseBody, 0, 1, true)
+
+				// app.SetFocus(cui.Response)
 			}
 		}
 
