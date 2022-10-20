@@ -11,11 +11,11 @@ type cuiApp struct {
 	Footer *tview.TextView
 
 	MethodDropdown *tview.DropDown
-	UrlInput *tview.InputField
+	UrlInput       *tview.InputField
 
-	Response *tview.Flex
-	ResponseStatus *tview.TextView
-	ResponseBody *tview.TextView
+	Response        *tview.Flex
+	ResponseStatus  *tview.TextView
+	ResponseBody    *tview.TextView
 	ResponseHeaders *tview.Table
 }
 
@@ -33,19 +33,19 @@ func main() {
 	}
 	methodGet := 2 // methods is zero-indexed
 
-	cui := cuiApp {
-		Footer: tview.NewTextView(),
-		MethodDropdown: tview.NewDropDown(),
-		UrlInput: tview.NewInputField(),
-		Response: tview.NewFlex(),
-		ResponseStatus: tview.NewTextView(),
-		ResponseBody: tview.NewTextView(),
+	cui := cuiApp{
+		Footer:          tview.NewTextView(),
+		MethodDropdown:  tview.NewDropDown(),
+		UrlInput:        tview.NewInputField(),
+		Response:        tview.NewFlex(),
+		ResponseStatus:  tview.NewTextView(),
+		ResponseBody:    tview.NewTextView(),
 		ResponseHeaders: tview.NewTable(),
 	}
 
 	req := cuiRequest{
 		Method: http.MethodGet,
-		URL: "http://example.com",
+		URL:    "http://example.com",
 	}
 
 	setInstructions(&cui, "")

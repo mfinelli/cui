@@ -10,7 +10,7 @@ import (
 
 type cuiRequest struct {
 	Method string
-	URL string
+	URL    string
 }
 
 func sendRequest(req cuiRequest, cui *cuiApp) error {
@@ -45,7 +45,7 @@ func sendRequest(req cuiRequest, cui *cuiApp) error {
 		for _, vv := range v {
 			cui.ResponseHeaders.SetCell(i, 0, tview.NewTableCell(k))
 			cui.ResponseHeaders.SetCell(i, 1, tview.NewTableCell(vv))
-			i+=1
+			i += 1
 		}
 	}
 
