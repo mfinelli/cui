@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -30,6 +32,14 @@ type cuiApp struct {
 }
 
 func main() {
+	logfile, err := os.OpenFile("cui.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer logfile.Close()
+	log.SetOutput(logfile)
+	log.SetFlags(1 | 2)
+
 	app := tview.NewApplication()
 	hasResponse := false
 	responseView := "body"

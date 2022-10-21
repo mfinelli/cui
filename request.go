@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	// "log"
 	"net/http"
 
 	"github.com/rivo/tview"
