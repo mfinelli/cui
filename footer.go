@@ -10,14 +10,14 @@ func setInstructions(cui *cuiApp, instr string) {
 	} else if instr == "ResponseHeaders" {
 		cui.Footer.SetText(" (q) lose focus  (t) response body")
 	} else if instr == "WithResponse" {
-		cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) edit request headers  (p) edit request parameters  (r) focus response")
+		cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) edit request headers  (p) edit request parameters  (r) focus response  (c) clear")
 	} else if instr == "RequestBody" {
-		cui.Footer.SetText(" (esc) done  (ctrl^e) edit in $EDITOR")
+		cui.Footer.SetText(" (esc) done  (k) set kind  (ctrl^e) edit in $EDITOR")
 	} else if instr == "RequestHeaders" {
 		cui.Footer.SetText(" (esc) done  (a) add new header  (d) delete selected header")
 	} else if instr == "RequestParameters" {
 		cui.Footer.SetText(" (esc) done  (a) add query parameter  (d) deleted selected parameter")
 	} else {
-		cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request body  (h) edit request headers  (p) edit request parameters")
+		cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request body  (h) edit request headers  (p) edit request parameters  (c) clear")
 	}
 }

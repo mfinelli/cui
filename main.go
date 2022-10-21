@@ -19,6 +19,7 @@ type cuiApp struct {
 	Request           *tview.Flex
 	RequestKind       *tview.DropDown
 	RequestBody       *tview.TextArea
+	RequestFormData   *tview.Table
 	RequestHeaders    *tview.TextView
 	RequestParameters *tview.TextView
 
@@ -55,6 +56,7 @@ func main() {
 		Request:           tview.NewFlex(),
 		RequestKind:       tview.NewDropDown(),
 		RequestBody:       tview.NewTextArea(),
+		RequestFormData:   tview.NewTable(),
 		RequestHeaders:    tview.NewTextView(),
 		RequestParameters: tview.NewTextView(),
 		Response:          tview.NewFlex(),
@@ -131,7 +133,7 @@ func main() {
 			} else if event.Rune() == 117 { // u
 				setInstructions(&cui, "UrlInput")
 				app.SetFocus(cui.UrlInput)
-				return nil
+				return nil // return nil to prevent u from being inserted
 			} else if event.Rune() == 114 && hasResponse { // r
 				if responseView == "body" {
 					setInstructions(&cui, "ResponseBody")
@@ -139,6 +141,13 @@ func main() {
 					setInstructions(&cui, "ResponseHeaders")
 				}
 				app.SetFocus(cui.Response)
+			} else if event.Rune() == 101 { // e
+				setInstructions(&cui, "RequestBody")
+				app.SetFocus(cui.Request)
+				return nil // return nil to prevent e from being inserted
+			} else if event.Rune() == 104 { // h
+				setInstructions(&cui, "RequestHeaders")
+				app.SetFocus(cui.Request)
 			} else if event.Key() == tcell.KeyEnter {
 				if err := sendRequest(req, &cui, &hasResponse); err != nil {
 					panic(err)
@@ -187,7 +196,7 @@ func main() {
 		}
 
 		if app.GetFocus() == cui.RequestBody {
-			if event.Rune() == 113 { // q
+			if event.Key() == tcell.KeyEscape {
 				if hasResponse {
 					setInstructions(&cui, "WithResponse")
 				} else {
@@ -198,7 +207,7 @@ func main() {
 		}
 
 		if app.GetFocus() == cui.RequestHeaders {
-			if event.Rune() == 113 { // q
+			if event.Key() == tcell.KeyEscape {
 				if hasResponse {
 					setInstructions(&cui, "WithResponse")
 				} else {
@@ -209,7 +218,7 @@ func main() {
 		}
 
 		if app.GetFocus() == cui.RequestParameters {
-			if event.Rune() == 113 { // q
+			if event.Key() == tcell.KeyEscape {
 				if hasResponse {
 					setInstructions(&cui, "WithResponse")
 				} else {
