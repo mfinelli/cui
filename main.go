@@ -1,17 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
+const version = "0.1.0"
+
 type cuiApp struct {
 	Footer *tview.TextView
 
 	MethodDropdown *tview.DropDown
 	UrlInput       *tview.InputField
+
+	Request           *tview.Flex
+	RequestKind       *tview.DropDown
+	RequestBody       *tview.TextArea
+	RequestHeaders    *tview.TextView
+	RequestParameters *tview.TextView
 
 	Response        *tview.Flex
 	ResponseStatus  *tview.TextView
@@ -23,6 +32,7 @@ func main() {
 	app := tview.NewApplication()
 	hasResponse := false
 	responseView := "body"
+	// requestView := "body"
 
 	methods := []string{
 		http.MethodDelete,
@@ -35,14 +45,22 @@ func main() {
 	}
 	methodGet := 2 // methods is zero-indexed
 
+	requestKinds := []string{"Form Data", "JSON", "Raw"}
+	requestKind := 2 // requestKinds is zero-indexed
+
 	cui := cuiApp{
-		Footer:          tview.NewTextView(),
-		MethodDropdown:  tview.NewDropDown(),
-		UrlInput:        tview.NewInputField(),
-		Response:        tview.NewFlex(),
-		ResponseStatus:  tview.NewTextView(),
-		ResponseBody:    tview.NewTextView(),
-		ResponseHeaders: tview.NewTable(),
+		Footer:            tview.NewTextView(),
+		MethodDropdown:    tview.NewDropDown(),
+		UrlInput:          tview.NewInputField(),
+		Request:           tview.NewFlex(),
+		RequestKind:       tview.NewDropDown(),
+		RequestBody:       tview.NewTextArea(),
+		RequestHeaders:    tview.NewTextView(),
+		RequestParameters: tview.NewTextView(),
+		Response:          tview.NewFlex(),
+		ResponseStatus:    tview.NewTextView(),
+		ResponseBody:      tview.NewTextView(),
+		ResponseHeaders:   tview.NewTable(),
 	}
 
 	req := cuiRequest{
@@ -54,6 +72,8 @@ func main() {
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 
+	cui.RequestKind.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
+
 	methodAndUrl := tview.NewFlex().
 		AddItem(cui.MethodDropdown, 10, 0, false).
 		AddItem(cui.UrlInput, 0, 1, false)
@@ -62,9 +82,12 @@ func main() {
 		AddItem(cui.ResponseStatus, 1, 0, false).
 		AddItem(cui.ResponseBody, 0, 1, true)
 
+	cui.Request.SetDirection(tview.FlexRow).
+		AddItem(cui.RequestBody, 0, 1, true)
+
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(methodAndUrl, 1, 0, false).
-		AddItem(tview.NewTextView().SetText("request"), 0, 1, false).
+		AddItem(cui.Request, 0, 1, false).
 		AddItem(cui.Response, 0, 1, false)
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
@@ -73,7 +96,7 @@ func main() {
 		AddItem(tview.NewBox().SetBorder(true).SetTitle(" Request History "), 0, 1, false).
 		AddItem(newRequest, 0, 3, false)
 
-	header := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("cUI v1.0.0")
+	header := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText(fmt.Sprintf("cUI v%s", version))
 
 	main := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
@@ -160,6 +183,39 @@ func main() {
 				app.SetFocus(cui.Response)
 
 				return nil
+			}
+		}
+
+		if app.GetFocus() == cui.RequestBody {
+			if event.Rune() == 113 { // q
+				if hasResponse {
+					setInstructions(&cui, "WithResponse")
+				} else {
+					setInstructions(&cui, "")
+				}
+				app.SetFocus(main)
+			}
+		}
+
+		if app.GetFocus() == cui.RequestHeaders {
+			if event.Rune() == 113 { // q
+				if hasResponse {
+					setInstructions(&cui, "WithResponse")
+				} else {
+					setInstructions(&cui, "")
+				}
+				app.SetFocus(main)
+			}
+		}
+
+		if app.GetFocus() == cui.RequestParameters {
+			if event.Rune() == 113 { // q
+				if hasResponse {
+					setInstructions(&cui, "WithResponse")
+				} else {
+					setInstructions(&cui, "")
+				}
+				app.SetFocus(main)
 			}
 		}
 
