@@ -35,7 +35,7 @@ jobs:
               GOOS=$os GOARCH=$arch make cui
               mv cui cui_${{ github.ref_name }}_$os_$arch
               xz cui_${{ github.ref_name }}_$os_$arch
-              gpg -ba cui_${{ github.ref_name }}_$os_$arch
+              gpg -ba cui_${{ github.ref_name }}_$os_$arch.xz
             done
           done
       - run: ls -al
