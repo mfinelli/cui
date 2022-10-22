@@ -178,6 +178,10 @@ func main() {
 		}
 	})
 
+	cui.RequestBody.SetChangedFunc(func() {
+		req.Body = cui.RequestBody.GetText()
+	})
+
 	// fmt.Printf("%s: %d", string('x'), int('x'))
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if app.GetFocus() == main { // we're not focused on anything

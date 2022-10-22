@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	// "log"
 	"net/http"
@@ -35,6 +36,13 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 		return err
 	}
 
+	// query param handling
+	qParams := r.URL.Query()
+	for key, value := range req.Parameters {
+		qParams.Add(key, value)
+	}
+	r.URL.RawQuery = qParams.Encode()
+
 	// header handling
 	for header, value := range req.Headers {
 		// special handling for "host" header if set
@@ -43,6 +51,10 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 		} else {
 			r.Header.Set(header, value)
 		}
+	}
+
+	if req.Body != "" {
+		r.Body = io.NopCloser(strings.NewReader(req.Body))
 	}
 
 	res, err := client.Do(r)
