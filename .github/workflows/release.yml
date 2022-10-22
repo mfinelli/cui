@@ -28,6 +28,7 @@ jobs:
           cp -r vendor cui_${{ github.ref_name }}
           tar czvf cui_${{ github.ref_name }}.tar.gz cui_${{ github.ref_name}}
           gpg -ba cui_${{ github.ref_name }}.tar.gz
+          rm -rf cui_${{ github.ref_name }}
 
           for arch in amd64 arm64; do
             for os in darwin linux; do
