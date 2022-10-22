@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -102,6 +103,24 @@ func main() {
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 	cui.RequestHeaderKey.SetLabel("Key: ")
+	cui.RequestHeaderKey.SetAutocompleteFunc(func(currentText string) (entries []string) {
+		if len(currentText) == 0 {
+			return
+		}
+
+		// TODO: it would be neat if this was a fuzzy search
+		for _, word := range commonHeaderKeys {
+			if strings.HasPrefix(strings.ToLower(word), strings.ToLower(currentText)) {
+				entries = append(entries, word)
+			}
+		}
+
+		if len(entries) <= 1 {
+			entries = nil
+		}
+
+		return
+	})
 	cui.RequestHeaderValue.SetLabel("Value: ")
 
 	cui.RequestKindDropdown.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
