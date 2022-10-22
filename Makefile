@@ -9,7 +9,7 @@ cui: $(SOURCES)
 	go build -o $@ \
 		-trimpath \
 		-mod=readonly \
-		-ldflags "-s -w -linkmode=external" \
+		-ldflags "-s -w" \
 		.
 
 .PHONY: all clean
