@@ -270,6 +270,11 @@ func main() {
 				return nil // prevent "b" from being entered
 			}
 		} else if event.Rune() == 100 { // d
+			if focus == cui.RequestHeaders {
+				deleteHeader(app, &cui, &req)
+				setEditHeadersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
 		} else if event.Rune() == 101 { // e
 			if focus == main {
 				if requestView == "RequestBody" {

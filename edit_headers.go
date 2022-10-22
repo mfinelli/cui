@@ -14,14 +14,17 @@ func addHeader(cui *cuiApp, req *cuiRequest) {
 }
 
 func setEditHeadersPlain(cui *cuiApp, req *cuiRequest) {
-	cui.RequestHeaders.Clear()
+	cui.RequestHeaders.Clear().SetSelectable(true, false)
 	cui.Request.Clear().SetDirection(tview.FlexRow).
 		AddItem(cui.RequestHeaders, 0, 1, true)
 
 	i := 0
 	for header, value := range req.Headers {
+		header := header
+		value := value
 		cui.RequestHeaders.SetCell(i, 0, tview.NewTableCell(header))
 		cui.RequestHeaders.SetCell(i, 1, tview.NewTableCell(value))
+		i += 1
 	}
 }
 
@@ -35,5 +38,10 @@ func setEditHeadersAdd(cui *cuiApp, req *cuiRequest) {
 		AddItem(cui.RequestHeaders, 0, 1, false)
 }
 
-func deleteHeader(cui *cuiApp, req *cuiRequest) {
+func deleteHeader(app *tview.Application, cui *cuiApp, req *cuiRequest) {
+	if cui.RequestHeaders.GetRowCount() >= 1 {
+		row, _ := cui.RequestHeaders.GetSelection()
+		header := cui.RequestHeaders.GetCell(row, 0).Text
+		delete(req.Headers, header)
+	}
 }

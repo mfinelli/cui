@@ -20,7 +20,7 @@ func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
 	} else if instr == "RequestBodyFormdata" {
 		cui.Footer.SetText(" TODO")
 	} else if instr == "RequestHeaders" {
-		cui.Footer.SetText(" (esc) done  (a) add new header  (d) delete selected header  (b) edit request body  (p) edit query parameters")
+		cui.Footer.SetText(" (esc) done  (↑/↓) cycle headers  (a) add new header  (d) delete selected header  (b) edit request body  (p) edit query parameters")
 	} else if instr == "RequestHeaderAdd" {
 		cui.Footer.SetText(" (esc) cancel  (enter) done  (tab) cycle key/value")
 	} else if instr == "RequestParameters" {
