@@ -2,6 +2,31 @@
 
 Stop building complex curl statements, use a terminal-based request editor.
 
+## usage
+
+Launch the application and along the bottom row you can see the keyboard
+commands to interact with the interface.
+
+TODO: add some screenshots or a video
+
+### docker
+
+If you don't want to build/install you can use the docker image the same
+way that you would otherwise use the application.
+
+```shell
+docker run -it mfinelli/cui
+```
+
+### echo server
+
+For local development you can launch the echo server which will just return
+back the request that it received.
+
+```shell
+cui -server
+```
+
 ## license
 
 ```
