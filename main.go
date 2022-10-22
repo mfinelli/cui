@@ -212,6 +212,11 @@ func main() {
 				responseView = "body"
 				setInstructions(&cui, "ResponseBody", hasResponse)
 				app.SetFocus(cui.Response)
+			} else if focus == cui.RequestHeaderValue || focus == cui.RequestHeaderKey {
+				addHeader(&cui, &req)
+				setInstructions(&cui, requestView, hasResponse)
+				setEditHeadersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyEscape {
 			if focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {

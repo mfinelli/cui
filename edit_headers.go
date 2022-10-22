@@ -4,6 +4,15 @@ import (
 	"github.com/rivo/tview"
 )
 
+func addHeader(cui *cuiApp, req *cuiRequest) {
+	key := cui.RequestHeaderKey.GetText()
+	value := cui.RequestHeaderValue.GetText()
+
+	req.Headers[key] = value
+	cui.RequestHeaderKey.SetText("")
+	cui.RequestHeaderValue.SetText("")
+}
+
 func setEditHeadersPlain(cui *cuiApp, req *cuiRequest) {
 	cui.RequestHeaders.Clear()
 	cui.Request.Clear().SetDirection(tview.FlexRow).
