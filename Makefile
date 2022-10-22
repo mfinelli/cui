@@ -6,10 +6,6 @@ clean:
 	rm -rf cui
 
 cui: $(SOURCES)
-	go build -o $@ \
-		-trimpath \
-		-mod=readonly \
-		-ldflags "-s -w" \
-		.
+	go build -o $@ -trimpath -mod=readonly .
 
 .PHONY: all clean
