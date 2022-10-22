@@ -24,6 +24,8 @@ type cuiApp struct {
 	RequestBody         *tview.TextArea
 	RequestFormData     *tview.Table
 	RequestHeaders      *tview.Table
+	RequestHeaderKey    *tview.InputField
+	RequestHeaderValue  *tview.InputField
 	RequestParameters   *tview.TextView
 
 	Response        *tview.Flex
@@ -64,7 +66,8 @@ func main() {
 	app := tview.NewApplication()
 	hasResponse := false
 	responseView := "body"
-	requestView := "RequestBody"
+	// requestView := "RequestBody"
+	requestInputType := "Textarea"
 
 	requestKinds := []string{"Form Data", "JSON", "Raw"}
 	requestKind := 2 // requestKinds is zero-indexed
@@ -78,6 +81,8 @@ func main() {
 		RequestBody:         tview.NewTextArea(),
 		RequestFormData:     tview.NewTable(),
 		RequestHeaders:      tview.NewTable(),
+		RequestHeaderKey:    tview.NewInputField(),
+		RequestHeaderValue:  tview.NewInputField(),
 		RequestParameters:   tview.NewTextView(),
 		Response:            tview.NewFlex(),
 		ResponseStatus:      tview.NewTextView(),
@@ -93,7 +98,7 @@ func main() {
 		Body:       "",
 	}
 
-	setInstructions(&cui, "")
+	setInstructions(&cui, "", hasResponse)
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 
@@ -132,52 +137,60 @@ func main() {
 	cui.MethodDropdown.SetDoneFunc(func(key tcell.Key) {
 		// TODO: this leaves the dropdown focused...
 		app.SetFocus(main)
-		setInstructions(&cui, "")
+		setInstructions(&cui, "", hasResponse)
 		_, req.Method = cui.MethodDropdown.GetCurrentOption()
 	})
 	cui.MethodDropdown.SetSelectedFunc(func(text string, index int) {
 		app.SetFocus(main)
-		setInstructions(&cui, "")
+		setInstructions(&cui, "", hasResponse)
 		_, req.Method = cui.MethodDropdown.GetCurrentOption()
 	})
 	cui.UrlInput.SetDoneFunc(func(key tcell.Key) {
 		app.SetFocus(main)
-		setInstructions(&cui, "")
+		setInstructions(&cui, "", hasResponse)
 		req.URL = cui.UrlInput.GetText()
 	})
 
 	cui.RequestKindDropdown.SetDoneFunc(func(key tcell.Key) {
 		// TODO: this leaves the dropdown focused...
 		app.SetFocus(cui.Request)
-		setInstructions(&cui, "RequestBody")
 
 		_, kind := cui.RequestKindDropdown.GetCurrentOption()
 		if kind == "Raw" {
+			requestInputType = "Textarea"
 			delete(req.Headers, "Content-Type")
 			// TODO: ensure we have the raw text entry for body
 		} else if kind == "JSON" {
+			requestInputType = "Textarea"
 			req.Headers["Content-Type"] = "application/json"
 			// TODO: ensure we have the raw text entry for body
 		} else {
+			requestInputType = "Formdata"
 			req.Headers["Content-Type"] = "application/x-www-form-urlencoded"
 			// TODO: we need to set the key/val form entry for body
 		}
+
+		setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
 	})
 	cui.RequestKindDropdown.SetSelectedFunc(func(text string, index int) {
 		app.SetFocus(cui.Request)
-		setInstructions(&cui, "RequestBody")
 
 		_, kind := cui.RequestKindDropdown.GetCurrentOption()
 		if kind == "Raw" {
+			requestInputType = "Textarea"
 			delete(req.Headers, "Content-Type")
 			// TODO: ensure we have the raw text entry for body
 		} else if kind == "JSON" {
+			requestInputType = "Textarea"
 			req.Headers["Content-Type"] = "application/json"
 			// TODO: ensure we have the raw text entry for body
 		} else {
+			requestInputType = "Formdata"
 			req.Headers["Content-Type"] = "application/x-www-form-urlencoded"
 			// TODO: we need to set the key/val form entry for body
 		}
+
+		setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
 	})
 
 	cui.RequestBody.SetChangedFunc(func() {
@@ -186,136 +199,98 @@ func main() {
 
 	// fmt.Printf("%s: %d", string('x'), int('x'))
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if app.GetFocus() == main { // we're not focused on anything
-			if event.Rune() == 113 { // q
-				app.Stop()
-			} else if event.Rune() == 109 { // m
-				setInstructions(&cui, "MethodDropdown")
-				app.SetFocus(cui.MethodDropdown)
-			} else if event.Rune() == 117 { // u
-				setInstructions(&cui, "UrlInput")
-				app.SetFocus(cui.UrlInput)
-				return nil // return nil to prevent u from being inserted
-			} else if event.Rune() == 114 && hasResponse { // r
-				if responseView == "body" {
-					setInstructions(&cui, "ResponseBody")
-				} else {
-					setInstructions(&cui, "ResponseHeaders")
-				}
-				app.SetFocus(cui.Response)
-			} else if event.Rune() == 101 { // e
-				setInstructions(&cui, requestView)
-				app.SetFocus(cui.Request)
-				return nil // return nil to prevent e from being inserted
-			} else if event.Key() == tcell.KeyEnter {
+		focus := app.GetFocus()
+
+		if event.Key() == tcell.KeyEnter {
+			if focus == main {
 				if err := sendRequest(req, &cui, &hasResponse); err != nil {
 					panic(err)
 				}
 
-				setInstructions(&cui, "ResponseBody")
 				responseView = "body"
+				setInstructions(&cui, "ResponseBody", hasResponse)
 				app.SetFocus(cui.Response)
 			}
-		}
-
-		if app.GetFocus() == cui.ResponseBody {
-			if event.Key() == tcell.KeyEscape {
-				setInstructions(&cui, "WithResponse")
+		} else if event.Key() == tcell.KeyEscape {
+			if focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
+				setInstructions(&cui, "", hasResponse)
 				app.SetFocus(main)
-			} else if event.Rune() == 116 { // t
-				setInstructions(&cui, "ResponseHeaders")
+			}
+		} else if event.Key() == tcell.KeyCtrlH {
+			if focus == cui.RequestBody {
+				setInstructions(&cui, "RequestHeaders", hasResponse)
+				setEditHeadersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
+		} else if event.Key() == tcell.KeyCtrlK {
+			if focus == cui.RequestBody {
+				setInstructions(&cui, "RequestKindDropdown", hasResponse)
+				app.SetFocus(cui.RequestKindDropdown)
+			}
+		} else if event.Key() == tcell.KeyCtrlP {
+			if focus == cui.RequestBody {
+				setInstructions(&cui, "RequestParameters", hasResponse)
+				// TODO: set param view
+				app.SetFocus(cui.Request)
+			}
+		} else if event.Rune() == 97 { // a
+			if focus == cui.RequestHeaders {
+				setInstructions(&cui, "RequestHeaderAdd", hasResponse)
+				setEditHeadersAdd(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
+		} else if event.Rune() == 98 { // b
+		} else if event.Rune() == 100 { // d
+		} else if event.Rune() == 101 { //e
+			if focus == main {
+				setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
+				app.SetFocus(cui.Request)
+				return nil // prevent "e" from being inserted
+			}
+		} else if event.Rune() == 104 { // h
+		} else if event.Rune() == 109 { // m
+			if focus == main {
+				setInstructions(&cui, "MethodDropdown", hasResponse)
+				app.SetFocus(cui.MethodDropdown)
+			}
+		} else if event.Rune() == 112 { // p
+		} else if event.Rune() == 113 { // q
+			if focus == main {
+				app.Stop()
+				return nil
+			}
+		} else if event.Rune() == 114 { // r
+			if focus == main && hasResponse {
+				if responseView == "body" {
+					setInstructions(&cui, "ResponseBody", hasResponse)
+				} else {
+					setInstructions(&cui, "ResponseHeaders", hasResponse)
+				}
+
+				app.SetFocus(cui.Response)
+			}
+		} else if event.Rune() == 116 { // t
+			if focus == cui.ResponseBody {
 				responseView = "headers"
+				setInstructions(&cui, "ResponseHeaders", hasResponse)
 
 				cui.Response.Clear().SetDirection(tview.FlexRow).
 					AddItem(cui.ResponseHeaders, 0, 1, true)
-
 				app.SetFocus(cui.Response)
-
-				return nil
-			}
-
-		}
-
-		if app.GetFocus() == cui.ResponseHeaders {
-			if event.Key() == tcell.KeyEscape {
-				setInstructions(&cui, "WithResponse")
-				app.SetFocus(main)
-			} else if event.Rune() == 116 { // t
-				setInstructions(&cui, "ResponseBody")
+			} else if focus == cui.ResponseHeaders {
 				responseView = "body"
+				setInstructions(&cui, "ResponseBody", hasResponse)
 
 				cui.Response.Clear().SetDirection(tview.FlexRow).
 					AddItem(cui.ResponseStatus, 1, 0, false).
 					AddItem(cui.ResponseBody, 0, 1, true)
-
 				app.SetFocus(cui.Response)
-
-				return nil
 			}
-		}
-
-		if app.GetFocus() == cui.RequestBody {
-			if event.Key() == tcell.KeyEscape {
-				if hasResponse {
-					setInstructions(&cui, "WithResponse")
-				} else {
-					setInstructions(&cui, "")
-				}
-				app.SetFocus(main)
-			} else if event.Key() == tcell.KeyCtrlH {
-				requestView = "RequestHeaders"
-				setInstructions(&cui, requestView)
-
-				cui.RequestHeaders.Clear()
-				cui.Request.Clear().SetDirection(tview.FlexRow).
-					AddItem(cui.RequestHeaders, 0, 1, true)
-
-				i := 0
-				for header, value := range req.Headers {
-					cui.RequestHeaders.SetCell(i, 0, tview.NewTableCell(header))
-					cui.RequestHeaders.SetCell(i, 1, tview.NewTableCell(value))
-					i += 1
-				}
-
-				app.SetFocus(cui.Response)
-
-				return nil
-			} else if event.Key() == tcell.KeyCtrlP {
-				requestView = "RequestParameters"
-				setInstructions(&cui, requestView)
-			} else if event.Key() == tcell.KeyCtrlK {
-				setInstructions(&cui, "RequestKindDropdown")
-				app.SetFocus(cui.RequestKindDropdown)
-			}
-		}
-
-		if app.GetFocus() == cui.RequestHeaders {
-			if event.Key() == tcell.KeyEscape {
-				if hasResponse {
-					setInstructions(&cui, "WithResponse")
-				} else {
-					setInstructions(&cui, "")
-				}
-				app.SetFocus(main)
-			} else if event.Rune() == 97 { // a
-			} else if event.Rune() == 100 { // d
-			} else if event.Rune() == 98 { // b
-			} else if event.Rune() == 112 { // p
-			}
-		}
-
-		if app.GetFocus() == cui.RequestParameters {
-			if event.Key() == tcell.KeyEscape {
-				if hasResponse {
-					setInstructions(&cui, "WithResponse")
-				} else {
-					setInstructions(&cui, "")
-				}
-				app.SetFocus(main)
-			} else if event.Rune() == 97 { // a
-			} else if event.Rune() == 100 { // d
-			} else if event.Rune() == 98 { // b
-			} else if event.Rune() == 104 { // h
+		} else if event.Rune() == 117 { // u
+			if focus == main {
+				setInstructions(&cui, "UrlInput", hasResponse)
+				app.SetFocus(cui.UrlInput)
+				return nil // prevent "u" from being entered
 			}
 		}
 
