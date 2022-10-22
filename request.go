@@ -16,6 +16,10 @@ import (
 type cuiRequest struct {
 	Method string
 	URL    string
+
+	Headers    map[string]string
+	Body       string
+	Parameters map[string]string
 }
 
 func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
@@ -29,6 +33,16 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 	r, err := http.NewRequest(req.Method, req.URL, nil)
 	if err != nil {
 		return err
+	}
+
+	// header handling
+	for header, value := range req.Headers {
+		// special handling for "host" header if set
+		if strings.EqualFold("host", header) {
+			r.Host = value
+		} else {
+			r.Header.Set(header, value)
+		}
 	}
 
 	res, err := client.Do(r)

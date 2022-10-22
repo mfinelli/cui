@@ -19,12 +19,12 @@ type cuiApp struct {
 	MethodDropdown *tview.DropDown
 	UrlInput       *tview.InputField
 
-	Request           *tview.Flex
-	RequestKind       *tview.DropDown
-	RequestBody       *tview.TextArea
-	RequestFormData   *tview.Table
-	RequestHeaders    *tview.TextView
-	RequestParameters *tview.TextView
+	Request             *tview.Flex
+	RequestKindDropdown *tview.DropDown
+	RequestBody         *tview.TextArea
+	RequestFormData     *tview.Table
+	RequestHeaders      *tview.TextView
+	RequestParameters   *tview.TextView
 
 	Response        *tview.Flex
 	ResponseStatus  *tview.TextView
@@ -70,31 +70,34 @@ func main() {
 	requestKind := 2 // requestKinds is zero-indexed
 
 	cui := cuiApp{
-		Footer:            tview.NewTextView(),
-		MethodDropdown:    tview.NewDropDown(),
-		UrlInput:          tview.NewInputField(),
-		Request:           tview.NewFlex(),
-		RequestKind:       tview.NewDropDown(),
-		RequestBody:       tview.NewTextArea(),
-		RequestFormData:   tview.NewTable(),
-		RequestHeaders:    tview.NewTextView(),
-		RequestParameters: tview.NewTextView(),
-		Response:          tview.NewFlex(),
-		ResponseStatus:    tview.NewTextView(),
-		ResponseBody:      tview.NewTextView(),
-		ResponseHeaders:   tview.NewTable(),
+		Footer:              tview.NewTextView(),
+		MethodDropdown:      tview.NewDropDown(),
+		UrlInput:            tview.NewInputField(),
+		Request:             tview.NewFlex(),
+		RequestKindDropdown: tview.NewDropDown(),
+		RequestBody:         tview.NewTextArea(),
+		RequestFormData:     tview.NewTable(),
+		RequestHeaders:      tview.NewTextView(),
+		RequestParameters:   tview.NewTextView(),
+		Response:            tview.NewFlex(),
+		ResponseStatus:      tview.NewTextView(),
+		ResponseBody:        tview.NewTextView(),
+		ResponseHeaders:     tview.NewTable(),
 	}
 
 	req := cuiRequest{
-		Method: http.MethodGet,
-		URL:    "http://example.com",
+		Method:     http.MethodGet,
+		URL:        "http://example.com",
+		Headers:    make(map[string]string),
+		Parameters: make(map[string]string),
+		Body:       "",
 	}
 
 	setInstructions(&cui, "")
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
 
-	cui.RequestKind.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
+	cui.RequestKindDropdown.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
 
 	methodAndUrl := tview.NewFlex().
 		AddItem(cui.MethodDropdown, 10, 0, false).
@@ -105,6 +108,7 @@ func main() {
 		AddItem(cui.ResponseBody, 0, 1, true)
 
 	cui.Request.SetDirection(tview.FlexRow).
+		AddItem(cui.RequestKindDropdown, 1, 0, false).
 		AddItem(cui.RequestBody, 0, 1, true)
 
 	newRequest := tview.NewFlex().SetDirection(tview.FlexRow).
@@ -140,6 +144,38 @@ func main() {
 		app.SetFocus(main)
 		setInstructions(&cui, "")
 		req.URL = cui.UrlInput.GetText()
+	})
+
+	cui.RequestKindDropdown.SetDoneFunc(func(key tcell.Key) {
+		// TODO: this leaves the dropdown focused...
+		app.SetFocus(cui.Request)
+
+		_, kind := cui.RequestKindDropdown.GetCurrentOption()
+		if kind == "Raw" {
+			delete(req.Headers, "Content-Type")
+			// TODO: ensure we have the raw text entry for body
+		} else if kind == "JSON" {
+			req.Headers["Content-Type"] = "application/json"
+			// TODO: ensure we have the raw text entry for body
+		} else {
+			req.Headers["Content-Type"] = "application/x-www-form-urlencoded"
+			// TODO: we need to set the key/val form entry for body
+		}
+	})
+	cui.RequestKindDropdown.SetSelectedFunc(func(text string, index int) {
+		app.SetFocus(cui.Request)
+
+		_, kind := cui.RequestKindDropdown.GetCurrentOption()
+		if kind == "Raw" {
+			delete(req.Headers, "Content-Type")
+			// TODO: ensure we have the raw text entry for body
+		} else if kind == "JSON" {
+			req.Headers["Content-Type"] = "application/json"
+			// TODO: ensure we have the raw text entry for body
+		} else {
+			req.Headers["Content-Type"] = "application/x-www-form-urlencoded"
+			// TODO: we need to set the key/val form entry for body
+		}
 	})
 
 	// fmt.Printf("%s: %d", string('x'), int('x'))
@@ -223,6 +259,8 @@ func main() {
 					setInstructions(&cui, "")
 				}
 				app.SetFocus(main)
+			} else if event.Key() == tcell.KeyCtrlK {
+				app.SetFocus(cui.RequestKindDropdown)
 			}
 		}
 
