@@ -30,6 +30,7 @@ jobs:
           gpg -ba cui_${{ github.ref_name }}.tar.gz
           rm -rf cui_${{ github.ref_name }}
 
+          set -x
           for arch in amd64 arm64; do
             for os in darwin linux; do
               GOOS=$os GOARCH=$arch make cui
