@@ -6,6 +6,10 @@ clean:
 	rm -rf cui
 
 cui: $(SOURCES)
-	go build -o $@ .
+	go build -o $@ \
+		-trimpath \
+		-mod=readonly \
+		-ldflags "-s -w -linkmode=external" \
+		.
 
 .PHONY: all clean
