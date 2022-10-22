@@ -26,7 +26,7 @@ jobs:
           mkdir cui_${{ github.ref_name }}
           git archive HEAD | tar -x -C cui_${{ github.ref_name }}
           cp -r vendor cui_${{ github.ref_name }}
-          tar czvf cui_${{ github.ref_name }}.tar.gz
+          tar czvf cui_${{ github.ref_name }}.tar.gz cui_${{ github.ref_name}}
           gpg -ba cui_${{ github.ref_name }}.tar.gz
 
           for arch in amd64 arm64; do
