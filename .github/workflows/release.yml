@@ -2,8 +2,8 @@
 name: Release
 on:
   push:
-    # tags:
-    #   - 'v*'
+    tags:
+      - 'v*'
 
 jobs:
   publish:
@@ -38,8 +38,7 @@ jobs:
               gpg -ba cui_${{ github.ref_name }}_${os}_${arch}.xz
             done
           done
-      - run: ls -al
-      # - uses: ncipollo/release-action@v1
-      #   with:
-      #     artifacts: cui_*.tar.gz,cui_*.tar.gz.asc,cui_*.xz,cui_*.xz.asc
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: cui_*.tar.gz,cui_*.tar.gz.asc,cui_*.xz,cui_*.xz.asc
+          token: ${{ secrets.GITHUB_TOKEN }}
