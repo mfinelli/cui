@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,6 +33,26 @@ type cuiApp struct {
 }
 
 func main() {
+	methods := []string{
+		http.MethodDelete,
+		http.MethodHead,
+		http.MethodGet,
+		http.MethodOptions,
+		http.MethodPatch,
+		http.MethodPost,
+		http.MethodPut,
+	}
+	methodGet := 2 // methods is zero-indexed
+
+	// no help, because this is a hidden debug feature
+	serve := flag.Bool("server", false, "start simple echo dev server")
+	flag.Parse()
+
+	if *serve {
+		cuiDevServer(methods)
+		return
+	}
+
 	logfile, err := os.OpenFile("cui.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		panic(err)
@@ -44,17 +65,6 @@ func main() {
 	hasResponse := false
 	responseView := "body"
 	// requestView := "body"
-
-	methods := []string{
-		http.MethodDelete,
-		http.MethodHead,
-		http.MethodGet,
-		http.MethodOptions,
-		http.MethodPatch,
-		http.MethodPost,
-		http.MethodPut,
-	}
-	methodGet := 2 // methods is zero-indexed
 
 	requestKinds := []string{"Form Data", "JSON", "Raw"}
 	requestKind := 2 // requestKinds is zero-indexed
