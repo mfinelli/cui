@@ -30,13 +30,12 @@ jobs:
           gpg -ba cui_${{ github.ref_name }}.tar.gz
           rm -rf cui_${{ github.ref_name }}
 
-          set -x
           for arch in amd64 arm64; do
             for os in darwin linux; do
               GOOS=$os GOARCH=$arch make cui
-              mv cui cui_${{ github.ref_name }}_$os_$arch
-              xz cui_${{ github.ref_name }}_$os_$arch
-              gpg -ba cui_${{ github.ref_name }}_$os_$arch.xz
+              mv cui cui_${{ github.ref_name }}_${os}_${arch}
+              xz cui_${{ github.ref_name }}_${os}_${arch}
+              gpg -ba cui_${{ github.ref_name }}_${os}_${arch}.xz
             done
           done
       - run: ls -al
