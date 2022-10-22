@@ -66,7 +66,7 @@ func main() {
 	app := tview.NewApplication()
 	hasResponse := false
 	responseView := "body"
-	// requestView := "RequestBody"
+	requestView := "RequestBody"
 	requestInputType := "Textarea"
 
 	requestKinds := []string{"Form Data", "JSON", "Raw"}
@@ -101,6 +101,8 @@ func main() {
 	setInstructions(&cui, "", hasResponse)
 	cui.MethodDropdown.SetOptions(methods, nil).SetCurrentOption(methodGet)
 	cui.UrlInput.SetLabel("URL: ").SetPlaceholder("http://example.com")
+	cui.RequestHeaderKey.SetLabel("Key: ")
+	cui.RequestHeaderValue.SetLabel("Value: ")
 
 	cui.RequestKindDropdown.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
 
@@ -170,7 +172,7 @@ func main() {
 			// TODO: we need to set the key/val form entry for body
 		}
 
-		setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
+		setInstructions(&cui, requestView+requestInputType, hasResponse)
 	})
 	cui.RequestKindDropdown.SetSelectedFunc(func(text string, index int) {
 		app.SetFocus(cui.Request)
@@ -190,7 +192,7 @@ func main() {
 			// TODO: we need to set the key/val form entry for body
 		}
 
-		setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
+		setInstructions(&cui, requestView+requestInputType, hasResponse)
 	})
 
 	cui.RequestBody.SetChangedFunc(func() {
@@ -215,10 +217,21 @@ func main() {
 			if focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
 				setInstructions(&cui, "", hasResponse)
 				app.SetFocus(main)
+			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
+				setInstructions(&cui, "RequestHeaders", hasResponse)
+				setEditHeadersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
+		} else if event.Key() == tcell.KeyTab {
+			if focus == cui.RequestHeaderKey {
+				app.SetFocus(cui.RequestHeaderValue)
+			} else if focus == cui.RequestHeaderValue {
+				app.SetFocus(cui.RequestHeaderKey)
 			}
 		} else if event.Key() == tcell.KeyCtrlH {
 			if focus == cui.RequestBody {
-				setInstructions(&cui, "RequestHeaders", hasResponse)
+				requestView = "RequestHeaders"
+				setInstructions(&cui, requestView, hasResponse)
 				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
@@ -238,12 +251,27 @@ func main() {
 				setInstructions(&cui, "RequestHeaderAdd", hasResponse)
 				setEditHeadersAdd(&cui, &req)
 				app.SetFocus(cui.Request)
+				return nil // prevent "a" from being entered:w
 			}
 		} else if event.Rune() == 98 { // b
+			if focus == cui.RequestHeaders || focus == cui.RequestParameters {
+				requestView = "RequestBody"
+				setInstructions(&cui, requestView+requestInputType, hasResponse)
+
+				cui.Request.Clear().SetDirection(tview.FlexRow).
+					AddItem(cui.RequestKindDropdown, 1, 0, false).
+					AddItem(cui.RequestBody, 0, 1, true)
+				app.SetFocus(cui.Request)
+				return nil // prevent "b" from being entered
+			}
 		} else if event.Rune() == 100 { // d
-		} else if event.Rune() == 101 { //e
+		} else if event.Rune() == 101 { // e
 			if focus == main {
-				setInstructions(&cui, "RequestBody"+requestInputType, hasResponse)
+				if requestView == "RequestBody" {
+					setInstructions(&cui, requestView+requestInputType, hasResponse)
+				} else {
+					setInstructions(&cui, requestView, hasResponse)
+				}
 				app.SetFocus(cui.Request)
 				return nil // prevent "e" from being inserted
 			}

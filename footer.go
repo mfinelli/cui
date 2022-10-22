@@ -15,8 +15,10 @@ func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
 		cui.Footer.SetText(" (esc) done  (h/j/k/l) navigate  (s) save response body to file  (t) response headers")
 	} else if instr == "ResponseHeaders" {
 		cui.Footer.SetText(" (esc) done  (t) response body")
-	} else if instr == "RequestBody" {
+	} else if instr == "RequestBodyTextarea" {
 		cui.Footer.SetText(" (esc) done  (crtl^k) set kind  (ctrl^h) edit headers (ctrl^p) edit query parameters (ctrl^e) edit in $EDITOR")
+	} else if instr == "RequestBodyFormdata" {
+		cui.Footer.SetText(" TODO")
 	} else if instr == "RequestHeaders" {
 		cui.Footer.SetText(" (esc) done  (a) add new header  (d) delete selected header  (b) edit request body  (p) edit query parameters")
 	} else if instr == "RequestHeaderAdd" {
