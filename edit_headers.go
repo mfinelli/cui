@@ -20,8 +20,6 @@ func setEditHeadersPlain(cui *cuiApp, req *cuiRequest) {
 
 	i := 0
 	for header, value := range req.Headers {
-		header := header
-		value := value
 		cui.RequestHeaders.SetCell(i, 0, tview.NewTableCell(header))
 		cui.RequestHeaders.SetCell(i, 1, tview.NewTableCell(value))
 		i += 1
@@ -39,6 +37,7 @@ func setEditHeadersAdd(cui *cuiApp, req *cuiRequest) {
 }
 
 func deleteHeader(app *tview.Application, cui *cuiApp, req *cuiRequest) {
+	// TODO: keeping app around for now in case we want to implement modal confirm
 	if cui.RequestHeaders.GetRowCount() >= 1 {
 		row, _ := cui.RequestHeaders.GetSelection()
 		header := cui.RequestHeaders.GetCell(row, 0).Text

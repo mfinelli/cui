@@ -20,14 +20,16 @@ type cuiApp struct {
 	MethodDropdown *tview.DropDown
 	UrlInput       *tview.InputField
 
-	Request             *tview.Flex
-	RequestKindDropdown *tview.DropDown
-	RequestBody         *tview.TextArea
-	RequestFormData     *tview.Table
-	RequestHeaders      *tview.Table
-	RequestHeaderKey    *tview.InputField
-	RequestHeaderValue  *tview.InputField
-	RequestParameters   *tview.TextView
+	Request               *tview.Flex
+	RequestKindDropdown   *tview.DropDown
+	RequestBody           *tview.TextArea
+	RequestFormData       *tview.Table
+	RequestHeaders        *tview.Table
+	RequestHeaderKey      *tview.InputField
+	RequestHeaderValue    *tview.InputField
+	RequestParameters     *tview.Table
+	RequestParameterKey   *tview.InputField
+	RequestParameterValue *tview.InputField
 
 	Response        *tview.Flex
 	ResponseStatus  *tview.TextView
@@ -74,21 +76,23 @@ func main() {
 	requestKind := 2 // requestKinds is zero-indexed
 
 	cui := cuiApp{
-		Footer:              tview.NewTextView(),
-		MethodDropdown:      tview.NewDropDown(),
-		UrlInput:            tview.NewInputField(),
-		Request:             tview.NewFlex(),
-		RequestKindDropdown: tview.NewDropDown(),
-		RequestBody:         tview.NewTextArea(),
-		RequestFormData:     tview.NewTable(),
-		RequestHeaders:      tview.NewTable(),
-		RequestHeaderKey:    tview.NewInputField(),
-		RequestHeaderValue:  tview.NewInputField(),
-		RequestParameters:   tview.NewTextView(),
-		Response:            tview.NewFlex(),
-		ResponseStatus:      tview.NewTextView(),
-		ResponseBody:        tview.NewTextView(),
-		ResponseHeaders:     tview.NewTable(),
+		Footer:                tview.NewTextView(),
+		MethodDropdown:        tview.NewDropDown(),
+		UrlInput:              tview.NewInputField(),
+		Request:               tview.NewFlex(),
+		RequestKindDropdown:   tview.NewDropDown(),
+		RequestBody:           tview.NewTextArea(),
+		RequestFormData:       tview.NewTable(),
+		RequestHeaders:        tview.NewTable(),
+		RequestHeaderKey:      tview.NewInputField(),
+		RequestHeaderValue:    tview.NewInputField(),
+		RequestParameters:     tview.NewTable(),
+		RequestParameterKey:   tview.NewInputField(),
+		RequestParameterValue: tview.NewInputField(),
+		Response:              tview.NewFlex(),
+		ResponseStatus:        tview.NewTextView(),
+		ResponseBody:          tview.NewTextView(),
+		ResponseHeaders:       tview.NewTable(),
 	}
 
 	req := cuiRequest{
@@ -122,6 +126,8 @@ func main() {
 		return
 	})
 	cui.RequestHeaderValue.SetLabel("Value: ")
+	cui.RequestParameterKey.SetLabel("Key: ")
+	cui.RequestParameterValue.SetLabel("Value: ")
 
 	cui.RequestKindDropdown.SetOptions(requestKinds, nil).SetCurrentOption(requestKind)
 
@@ -236,6 +242,11 @@ func main() {
 				setInstructions(&cui, requestView, hasResponse)
 				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+			} else if focus == cui.RequestParameterValue || focus == cui.RequestParameterKey {
+				addParameter(&cui, &req)
+				setInstructions(&cui, requestView, hasResponse)
+				setEditParametersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyEscape {
 			if focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
@@ -245,12 +256,20 @@ func main() {
 				setInstructions(&cui, "RequestHeaders", hasResponse)
 				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+			} else if focus == cui.RequestParameterKey || focus == cui.RequestParameterValue {
+				setInstructions(&cui, "RequestParameters", hasResponse)
+				setEditParametersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyTab {
 			if focus == cui.RequestHeaderKey {
 				app.SetFocus(cui.RequestHeaderValue)
 			} else if focus == cui.RequestHeaderValue {
 				app.SetFocus(cui.RequestHeaderKey)
+			} else if focus == cui.RequestParameterKey {
+				app.SetFocus(cui.RequestParameterValue)
+			} else if focus == cui.RequestParameterValue {
+				app.SetFocus(cui.RequestParameterKey)
 			}
 		} else if event.Key() == tcell.KeyCtrlH {
 			if focus == cui.RequestBody {
@@ -266,8 +285,9 @@ func main() {
 			}
 		} else if event.Key() == tcell.KeyCtrlP {
 			if focus == cui.RequestBody {
-				setInstructions(&cui, "RequestParameters", hasResponse)
-				// TODO: set param view
+				requestView = "RequestParameters"
+				setInstructions(&cui, requestView, hasResponse)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 97 { // a
@@ -275,7 +295,12 @@ func main() {
 				setInstructions(&cui, "RequestHeaderAdd", hasResponse)
 				setEditHeadersAdd(&cui, &req)
 				app.SetFocus(cui.Request)
-				return nil // prevent "a" from being entered:w
+				return nil // prevent "a" from being entered
+			} else if focus == cui.RequestParameters {
+				setInstructions(&cui, "RequestParameterAdd", hasResponse)
+				setEditParametersAdd(&cui, &req)
+				app.SetFocus(cui.Request)
+				return nil // prevent "a" from being entered
 			}
 		} else if event.Rune() == 98 { // b
 			if focus == cui.RequestHeaders || focus == cui.RequestParameters {
@@ -293,6 +318,10 @@ func main() {
 				deleteHeader(app, &cui, &req)
 				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+			} else if focus == cui.RequestParameters {
+				deleteParameter(app, &cui, &req)
+				setEditParametersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 101 { // e
 			if focus == main {
@@ -305,12 +334,24 @@ func main() {
 				return nil // prevent "e" from being inserted
 			}
 		} else if event.Rune() == 104 { // h
+			if focus == cui.RequestParameters {
+				requestView = "RequestHeaders"
+				setInstructions(&cui, requestView, hasResponse)
+				setEditHeadersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
 		} else if event.Rune() == 109 { // m
 			if focus == main {
 				setInstructions(&cui, "MethodDropdown", hasResponse)
 				app.SetFocus(cui.MethodDropdown)
 			}
 		} else if event.Rune() == 112 { // p
+			if focus == cui.RequestHeaders {
+				requestView = "RequestParameters"
+				setInstructions(&cui, requestView, hasResponse)
+				setEditParametersPlain(&cui, &req)
+				app.SetFocus(cui.Request)
+			}
 		} else if event.Rune() == 113 { // q
 			if focus == main {
 				app.Stop()
