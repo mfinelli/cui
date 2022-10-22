@@ -1,0 +1,44 @@
+---
+name: Release
+on:
+  push:
+    # tags:
+    #   - 'v*'
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          cache: false
+          go-version-file: go.mod
+      - uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - run: go mod vendor
+      - run: |
+          mkdir cui_${{ github.ref_name }}
+          git archive HEAD | tar -x -C cui_${{ github.ref_name }}
+          cp -r vendor cui_${{ github.ref_name }}
+          tar czvf cui_${{ github.ref_name }}.tar.gz
+          gpg -ba cui_${{ github.ref_name }}.tar.gz
+
+          for arch in amd64 arm64; do
+            for os in darwin linux; do
+              GOOS=$os GOARCH=$arch make cui
+              mv cui cui_${{ github.ref_name }}_$os_$arch
+              xz cui_${{ github.ref_name }}_$os_$arch
+              gpg -ba cui_${{ github.ref_name }}_$os_$arch
+            done
+          done
+      - run: ls -al
+      # - uses: ncipollo/release-action@v1
+      #   with:
+      #     artifacts: cui_*.tar.gz,cui_*.tar.gz.asc,cui_*.xz,cui_*.xz.asc
+      #     token: ${{ secrets.GITHUB_TOKEN }}
