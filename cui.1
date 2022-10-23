@@ -1,0 +1,38 @@
+.TH CUI 1
+.SH NAME
+cui \- http request/response tui
+.SH SYNOPSIS
+.B cui
+.SH DESCRIPTION
+.B cui
+is a terminal UI for making http requests against remote servers. It allows
+you to set headers and query parameters as well as easily modify the request
+body if necessary. After making a request it allows you to interactively
+inspect the response.
+.SH OPTIONS
+.TP
+.BR \-server
+Mentioned here for completeness, but this is mostly a debugging feature and
+starts up a basic echo server that responds (in the response body) with a
+summary of the request that it received.
+.SH SEE ALSO
+curl(1)
+.SH BUGS
+There are definitely bugs, please report them: https://github.com/mfinelli/cui.
+.SH AUTHOR
+Mario Finelli
+.SH COPYRIGHT
+Copyright 2022 Mario Finelli
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
