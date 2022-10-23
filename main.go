@@ -336,6 +336,12 @@ func main() {
 				app.SetFocus(cui.Request)
 				return nil // prevent "b" from being entered
 			}
+		} else if event.Rune() == 99 { // c
+			if focus == cui.Main {
+				req = initRequest(app, &cui, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
+				setInstructions(&cui, "")
+				app.SetFocus(cui.Main)
+			}
 		} else if event.Rune() == 100 { // d
 			if focus == cui.RequestHeaders {
 				deleteHeader(app, &cui, req)
