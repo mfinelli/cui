@@ -34,7 +34,7 @@ and then make and push the relevant git tag.
 
 ### terminal video
 
-The terminal video is make using [asciinema](https://asciinema.org):
+The terminal video is made using [asciinema](https://asciinema.org):
 
 ```shell
 asciinema rec cui.cast -c ./cui -t cui
