@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022  Mario Finelli
+// Copyright 2022 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -166,6 +166,7 @@ func main() {
 		AddItem(cui.MethodDropdown, 10, 0, false).
 		AddItem(cui.UrlInput, 0, 1, false)
 
+	cui.Response.SetBorder(true).SetTitle(" Response ")
 	cui.Response.SetDirection(tview.FlexRow).
 		AddItem(cui.ResponseStatus, 1, 0, false).
 		AddItem(cui.ResponseBody, 0, 1, true)
@@ -283,7 +284,7 @@ func main() {
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyEscape {
-			if focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
+			if focus == cui.RequestHistory || focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
 				setInstructions(&cui, "", hasResponse)
 				app.SetFocus(main)
 			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
@@ -368,7 +369,12 @@ func main() {
 				return nil // prevent "e" from being inserted
 			}
 		} else if event.Rune() == 104 { // h
-			if focus == cui.RequestParameters {
+			if focus == main {
+				// TODO: maybe only switch (and update instructions to reflect)
+				// if there are actually items in the request history
+				setInstructions(&cui, "RequestHistory", hasResponse)
+				app.SetFocus(cui.RequestHistory)
+			} else if focus == cui.RequestParameters {
 				requestView = "RequestHeaders"
 				setInstructions(&cui, requestView, hasResponse)
 				setEditHeadersPlain(&cui, &req)
