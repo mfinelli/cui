@@ -17,12 +17,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	// "log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/chroma/v2/formatters"
 	"github.com/alecthomas/chroma/v2/lexers"
@@ -31,15 +35,37 @@ import (
 )
 
 type cuiRequest struct {
-	Method string
-	URL    string
+	Method string `json:"method"`
+	URL    string `json:"url"`
 
-	Headers    map[string]string
-	Body       string
-	Parameters map[string]string
+	Headers    map[string]string `json:"headers"`
+	Body       string            `json:"body"`
+	Parameters map[string]string `json:"parameters"`
+}
+
+type cuiStoredRequest struct {
+	CuiVersion string `json:"version"`
+
+	StatusCode int   `json:"status"`
+	Timestamp  int64 `json:"timestamp"`
+
+	Method string `json:"method"`
+	URL    string `json:"url"`
+
+	Parameters map[string]string `json:"parameters"`
+	Headers    map[string]string `json:"headers"`
+	Body       string            `json:"body"`
 }
 
 func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
+	// we assume this directory exists because we created it on startup
+	// for the logfile
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return err
+	}
+	cacheDir = filepath.Join(cacheDir, "cui")
+
 	client := &http.Client{}
 	cui.ResponseBody.Clear()
 	cui.ResponseHeaders.Clear()
@@ -129,6 +155,27 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 	}
 
 	*hasResponse = true
+
+	store := cuiStoredRequest{
+		CuiVersion: version,
+		StatusCode: res.StatusCode,
+		Timestamp:  time.Now().Unix(),
+		Method:     req.Method,
+		URL:        req.URL,
+		Parameters: req.Parameters,
+		Headers:    req.Headers,
+		Body:       req.Body,
+	}
+
+	jsonBytes, err := json.Marshal(store)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(cacheDir, fmt.Sprintf("request-%d.json", store.Timestamp)), jsonBytes, 0644)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
