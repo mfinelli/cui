@@ -24,18 +24,22 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/rivo/tview"
 )
 
-func insertHistoryItem(store *cuiStoredRequest, cui *cuiApp) {
+func insertHistoryItem(app *tview.Application, store *cuiStoredRequest, cui *cuiApp, req *cuiRequest) {
 	text := fmt.Sprintf("%s: %s", store.Method, store.URL)
 	second := fmt.Sprintf("%d %s", store.StatusCode, timeOutput(store.Timestamp))
 
 	cui.RequestHistory.InsertItem(0, text, second, 0, func() {
-		cui.Footer.SetText(fmt.Sprintf("am i a closure? %s", store.URL))
+		req = initRequest(app, cui, store.Method, store.URL, store.Body, store.Parameters, store.Headers)
+		setInstructions(cui, "")
+		app.SetFocus(cui.Main)
 	})
 }
 
-func setupRequestHistory(cui *cuiApp) error {
+func setupRequestHistory(app *tview.Application, cui *cuiApp, cuiReq *cuiRequest) error {
 	cui.RequestHistory.Clear()
 
 	// we assume this directory exists because we created it on startup
@@ -69,7 +73,7 @@ func setupRequestHistory(cui *cuiApp) error {
 
 		// TODO: we could do a version check here to make sure that
 		// we can hndle the format
-		insertHistoryItem(&req, cui)
+		insertHistoryItem(app, &req, cui, cuiReq)
 	}
 
 	cui.RequestHistory.SetCurrentItem(0)

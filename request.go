@@ -57,7 +57,7 @@ type cuiStoredRequest struct {
 	Body       string            `json:"body"`
 }
 
-func sendRequest(req *cuiRequest, cui *cuiApp) error {
+func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 	// we assume this directory exists because we created it on startup
 	// for the logfile
 	cacheDir, err := os.UserCacheDir()
@@ -177,7 +177,7 @@ func sendRequest(req *cuiRequest, cui *cuiApp) error {
 		return err
 	}
 
-	insertHistoryItem(&store, cui)
+	insertHistoryItem(app, &store, cui, req)
 	cui.RequestHistory.SetCurrentItem(0)
 
 	return nil

@@ -253,7 +253,7 @@ func main() {
 
 		if event.Key() == tcell.KeyEnter {
 			if focus == cui.Main {
-				if err := sendRequest(req, &cui); err != nil {
+				if err := sendRequest(app, req, &cui); err != nil {
 					panic(err)
 				}
 
@@ -429,7 +429,7 @@ func main() {
 		return event
 	})
 
-	err = setupRequestHistory(&cui)
+	err = setupRequestHistory(app, &cui, req)
 	if err != nil {
 		panic(err)
 	}
