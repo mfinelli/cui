@@ -7,7 +7,7 @@ Stop building complex curl statements, use a terminal-based request editor.
 Launch the application and along the bottom row you can see the keyboard
 commands to interact with the interface.
 
-TODO: add some screenshots or a video
+![Demo](cui.gif)
 
 ### docker
 
@@ -31,6 +31,15 @@ cui -server
 
 Releases are automated, simply edit the version in `Dockerfile` and `main.go`,
 and then make and push the relevant git tag.
+
+### terminal video
+
+The terminal video is make using [asciinema](https://asciinema.org):
+
+```shell
+asciinema rec cui.cast -c ./cui -t cui
+agg cui.cast cui.gif
+```
 
 ## license
 
