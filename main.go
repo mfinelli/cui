@@ -48,6 +48,8 @@ type cuiApp struct {
 	RequestParameterKey   *tview.InputField
 	RequestParameterValue *tview.InputField
 
+	RequestHistory *tview.List
+
 	Response        *tview.Flex
 	ResponseStatus  *tview.TextView
 	ResponseBody    *tview.TextView
@@ -117,6 +119,7 @@ func main() {
 		RequestParameters:     tview.NewTable(),
 		RequestParameterKey:   tview.NewInputField(),
 		RequestParameterValue: tview.NewInputField(),
+		RequestHistory:        tview.NewList(),
 		Response:              tview.NewFlex(),
 		ResponseStatus:        tview.NewTextView(),
 		ResponseBody:          tview.NewTextView(),
@@ -178,8 +181,11 @@ func main() {
 
 	newRequest.SetBorder(true).SetTitle(" New Request ")
 
+	history := tview.NewFlex().AddItem(cui.RequestHistory, 0, 1, false)
+	history.SetBorder(true).SetTitle(" Request History ")
+
 	inner := tview.NewFlex().
-		AddItem(tview.NewBox().SetBorder(true).SetTitle(" Request History "), 0, 1, false).
+		AddItem(history, 0, 1, false).
 		AddItem(newRequest, 0, 3, false)
 
 	header := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText(fmt.Sprintf("cUI v%s", version))
@@ -422,6 +428,11 @@ func main() {
 
 		return event
 	})
+
+	err = setupRequestHistory(&cui)
+	if err != nil {
+		panic(err)
+	}
 
 	if err := app.SetRoot(main, true).Run(); err != nil {
 		panic(err)
