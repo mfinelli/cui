@@ -27,11 +27,16 @@ back the request that it received.
 cui -server
 ```
 
+## releases
+
+Releases are automated, simply edit the version in `Dockerfile` and `main.go`,
+and then make and push the relevant git tag.
+
 ## license
 
 ```
 cui: http request/response tui
-Copyright 2022  Mario Finelli
+Copyright 2022 Mario Finelli
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
