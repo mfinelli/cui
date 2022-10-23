@@ -33,7 +33,7 @@ func insertHistoryItem(app *tview.Application, store *cuiStoredRequest, cui *cui
 	second := fmt.Sprintf("%d %s", store.StatusCode, timeOutput(store.Timestamp))
 
 	cui.RequestHistory.InsertItem(0, text, second, 0, func() {
-		req = initRequest(app, cui, store.Method, store.URL, store.Body, store.Parameters, store.Headers)
+		initRequest(app, cui, req, store.Method, store.URL, store.Body, store.Parameters, store.Headers)
 		setInstructions(cui, "")
 		app.SetFocus(cui.Main)
 	})

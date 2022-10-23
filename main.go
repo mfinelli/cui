@@ -177,7 +177,8 @@ func main() {
 
 	header := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText(fmt.Sprintf("cUI v%s", version))
 
-	req := initRequest(app, &cui, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
+	req := cuiRequest{}
+	initRequest(app, &cui, &req, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
 
 	cui.Main.SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
@@ -253,7 +254,7 @@ func main() {
 
 		if event.Key() == tcell.KeyEnter {
 			if focus == cui.Main {
-				if err := sendRequest(app, req, &cui); err != nil {
+				if err := sendRequest(app, &req, &cui); err != nil {
 					panic(err)
 				}
 
@@ -261,14 +262,14 @@ func main() {
 				setInstructions(&cui, "ResponseBody")
 				app.SetFocus(cui.Response)
 			} else if focus == cui.RequestHeaderValue || focus == cui.RequestHeaderKey {
-				addHeader(&cui, req)
+				addHeader(&cui, &req)
 				setInstructions(&cui, cui.ViewRequest)
-				setEditHeadersPlain(&cui, req)
+				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			} else if focus == cui.RequestParameterValue || focus == cui.RequestParameterKey {
-				addParameter(&cui, req)
+				addParameter(&cui, &req)
 				setInstructions(&cui, cui.ViewRequest)
-				setEditParametersPlain(&cui, req)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyEscape {
@@ -277,11 +278,11 @@ func main() {
 				app.SetFocus(cui.Main)
 			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
 				setInstructions(&cui, "RequestHeaders")
-				setEditHeadersPlain(&cui, req)
+				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			} else if focus == cui.RequestParameterKey || focus == cui.RequestParameterValue {
 				setInstructions(&cui, "RequestParameters")
-				setEditParametersPlain(&cui, req)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyTab {
@@ -298,7 +299,7 @@ func main() {
 			if focus == cui.RequestBody {
 				cui.ViewRequest = "RequestHeaders"
 				setInstructions(&cui, cui.ViewRequest)
-				setEditHeadersPlain(&cui, req)
+				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Key() == tcell.KeyCtrlK {
@@ -310,18 +311,18 @@ func main() {
 			if focus == cui.RequestBody {
 				cui.ViewRequest = "RequestParameters"
 				setInstructions(&cui, cui.ViewRequest)
-				setEditParametersPlain(&cui, req)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 97 { // a
 			if focus == cui.RequestHeaders {
 				setInstructions(&cui, "RequestHeaderAdd")
-				setEditHeadersAdd(&cui, req)
+				setEditHeadersAdd(&cui, &req)
 				app.SetFocus(cui.Request)
 				return nil // prevent "a" from being entered
 			} else if focus == cui.RequestParameters {
 				setInstructions(&cui, "RequestParameterAdd")
-				setEditParametersAdd(&cui, req)
+				setEditParametersAdd(&cui, &req)
 				app.SetFocus(cui.Request)
 				return nil // prevent "a" from being entered
 			}
@@ -338,18 +339,18 @@ func main() {
 			}
 		} else if event.Rune() == 99 { // c
 			if focus == cui.Main {
-				req = initRequest(app, &cui, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
+				initRequest(app, &cui, &req, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
 				setInstructions(&cui, "")
 				app.SetFocus(cui.Main)
 			}
 		} else if event.Rune() == 100 { // d
 			if focus == cui.RequestHeaders {
-				deleteHeader(app, &cui, req)
-				setEditHeadersPlain(&cui, req)
+				deleteHeader(app, &cui, &req)
+				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			} else if focus == cui.RequestParameters {
-				deleteParameter(app, &cui, req)
-				setEditParametersPlain(&cui, req)
+				deleteParameter(app, &cui, &req)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 101 { // e
@@ -371,7 +372,7 @@ func main() {
 			} else if focus == cui.RequestParameters {
 				cui.ViewRequest = "RequestHeaders"
 				setInstructions(&cui, cui.ViewRequest)
-				setEditHeadersPlain(&cui, req)
+				setEditHeadersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 109 { // m
@@ -383,7 +384,7 @@ func main() {
 			if focus == cui.RequestHeaders {
 				cui.ViewRequest = "RequestParameters"
 				setInstructions(&cui, cui.ViewRequest)
-				setEditParametersPlain(&cui, req)
+				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
 		} else if event.Rune() == 113 { // q
@@ -429,7 +430,7 @@ func main() {
 		return event
 	})
 
-	err = setupRequestHistory(app, &cui, req)
+	err = setupRequestHistory(app, &cui, &req)
 	if err != nil {
 		panic(err)
 	}

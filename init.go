@@ -20,7 +20,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-func initRequest(app *tview.Application, cui *cuiApp, method, url, body string, params, headers map[string]string) *cuiRequest {
+func initRequest(app *tview.Application, cui *cuiApp, req *cuiRequest, method, url, body string, params, headers map[string]string) {
 	methodIndex := getStrSliceIndex(&httpMethods, method)
 	requestKind := getStrSliceIndex(&requestKinds, "Raw")
 
@@ -49,13 +49,9 @@ func initRequest(app *tview.Application, cui *cuiApp, method, url, body string, 
 		url = "http://example.com"
 	}
 
-	req := cuiRequest{
-		Method:     method,
-		URL:        url,
-		Headers:    headers,
-		Parameters: params,
-		Body:       body,
-	}
-
-	return &req
+	req.Method = method
+	req.URL = url
+	req.Headers = headers
+	req.Parameters = params
+	req.Body = body
 }
