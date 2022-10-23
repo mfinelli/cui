@@ -17,8 +17,12 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func setupRequestHistory(cui *cuiApp) error {
@@ -39,9 +43,34 @@ func setupRequestHistory(cui *cuiApp) error {
 
 	// TODO: we probably need to sort this list
 	for _, file := range files {
-		// TODO: main text Method URL
-		cui.RequestHistory.InsertItem(-1, file, "TODO: Status: Timestamp", 0, nil)
+		req := cuiStoredRequest{}
+
+		b, err := ioutil.ReadFile(file)
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal([]byte(b), &req)
+		if err != nil {
+			return err
+		}
+
+		// TODO: we could do a version check here to make sure that
+		// we can hndle the format
+
+		text := fmt.Sprintf("%s: %s", req.Method, req.URL)
+		second := fmt.Sprintf("%d %s", req.StatusCode, timeOutput(req.Timestamp))
+
+		cui.RequestHistory.InsertItem(-1, text, second, 0, nil)
 	}
 
 	return nil
+}
+
+func timeOutput(timestamp int64) string {
+	// TODO if it's today just show the time (e.g., 12:30)
+	// if it's more than today but the same week show the day (e.g., Mon 19:00)
+	// if it's more than a week show the full date (e.g., 1 Feb 6:00)
+	t := time.Unix(timestamp, 0)
+	return t.Format(time.UnixDate)
 }
