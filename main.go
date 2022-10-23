@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -74,7 +75,18 @@ func main() {
 		return
 	}
 
-	logfile, err := os.OpenFile("cui.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		panic(err)
+	}
+	cacheDir = filepath.Join(cacheDir, "cui")
+
+	err = os.MkdirAll(cacheDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	logfile, err := os.OpenFile(filepath.Join(cacheDir, "cui.log"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		panic(err)
 	}
