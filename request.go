@@ -57,7 +57,7 @@ type cuiStoredRequest struct {
 	Body       string            `json:"body"`
 }
 
-func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
+func sendRequest(req *cuiRequest, cui *cuiApp) error {
 	// we assume this directory exists because we created it on startup
 	// for the logfile
 	cacheDir, err := os.UserCacheDir()
@@ -154,7 +154,7 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 		cui.ResponseBody.SetText(string(body)).ScrollToBeginning()
 	}
 
-	*hasResponse = true
+	cui.ViewHasResponse = true
 
 	store := cuiStoredRequest{
 		CuiVersion: version,

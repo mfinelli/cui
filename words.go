@@ -16,6 +16,22 @@
 
 package main
 
+import (
+	"net/http"
+)
+
+var requestKinds = []string{"Form Data", "JSON", "Raw"}
+
+var httpMethods = []string{
+	http.MethodDelete,
+	http.MethodHead,
+	http.MethodGet,
+	http.MethodOptions,
+	http.MethodPatch,
+	http.MethodPost,
+	http.MethodPut,
+}
+
 // a subset from: https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
 var commonHeaderKeys = []string{
 	"Accept",

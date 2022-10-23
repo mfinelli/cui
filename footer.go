@@ -20,7 +20,7 @@ import (
 	"log"
 )
 
-func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
+func setInstructions(cui *cuiApp, instr string) {
 	if instr == "RequestHistory" {
 		cui.Footer.SetText(" (esc) done  (enter) load  (↑/↓) navigate  (d) delete)")
 	} else if instr == "MethodDropdown" {
@@ -48,10 +48,10 @@ func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
 			log.Printf("Couldn't find instructions for '%s'\n", instr)
 		}
 
-		if hasResponse {
+		if cui.ViewHasResponse {
 			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (r) focus response  (h) history  (c) clear")
 		} else {
-			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (history)  (c) clear")
+			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) history  (c) clear")
 		}
 	}
 }

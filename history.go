@@ -30,7 +30,9 @@ func insertHistoryItem(store *cuiStoredRequest, cui *cuiApp) {
 	text := fmt.Sprintf("%s: %s", store.Method, store.URL)
 	second := fmt.Sprintf("%d %s", store.StatusCode, timeOutput(store.Timestamp))
 
-	cui.RequestHistory.InsertItem(0, text, second, 0, nil)
+	cui.RequestHistory.InsertItem(0, text, second, 0, func() {
+		cui.Footer.SetText(fmt.Sprintf("am i a closure? %s", store.URL))
+	})
 }
 
 func setupRequestHistory(cui *cuiApp) error {
