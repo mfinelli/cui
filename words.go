@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022  Mario Finelli
+// Copyright 2022 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package main
+
+import (
+	"net/http"
+)
+
+var requestKinds = []string{"Form Data", "JSON", "Raw"}
+
+var httpMethods = []string{
+	http.MethodDelete,
+	http.MethodHead,
+	http.MethodGet,
+	http.MethodOptions,
+	http.MethodPatch,
+	http.MethodPost,
+	http.MethodPut,
+}
 
 // a subset from: https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
 var commonHeaderKeys = []string{

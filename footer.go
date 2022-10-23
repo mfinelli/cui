@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022  Mario Finelli
+// Copyright 2022 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@ import (
 	"log"
 )
 
-func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
-	if instr == "MethodDropdown" {
+func setInstructions(cui *cuiApp, instr string) {
+	if instr == "RequestHistory" {
+		cui.Footer.SetText(" (esc) done  (enter) load  (↑/↓) navigate  (d) delete)")
+	} else if instr == "MethodDropdown" {
 		cui.Footer.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
 	} else if instr == "RequestKindDropdown" {
 		cui.Footer.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
@@ -46,10 +48,10 @@ func setInstructions(cui *cuiApp, instr string, hasResponse bool) {
 			log.Printf("Couldn't find instructions for '%s'\n", instr)
 		}
 
-		if hasResponse {
-			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (r) focus response  (c) clear")
+		if cui.ViewHasResponse {
+			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (r) focus response  (h) history  (c) clear")
 		} else {
-			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (c) clear")
+			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) history  (c) clear")
 		}
 	}
 }
