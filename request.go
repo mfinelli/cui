@@ -177,5 +177,8 @@ func sendRequest(req cuiRequest, cui *cuiApp, hasResponse *bool) error {
 		return err
 	}
 
+	insertHistoryItem(&store, cui)
+	cui.RequestHistory.SetCurrentItem(0)
+
 	return nil
 }

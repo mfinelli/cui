@@ -22,8 +22,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 )
+
+func insertHistoryItem(store *cuiStoredRequest, cui *cuiApp) {
+	text := fmt.Sprintf("%s: %s", store.Method, store.URL)
+	second := fmt.Sprintf("%d %s", store.StatusCode, timeOutput(store.Timestamp))
+
+	cui.RequestHistory.InsertItem(0, text, second, 0, nil)
+}
 
 func setupRequestHistory(cui *cuiApp) error {
 	cui.RequestHistory.Clear()
@@ -41,6 +49,8 @@ func setupRequestHistory(cui *cuiApp) error {
 		return err
 	}
 
+	sort.Strings(files)
+
 	// TODO: we probably need to sort this list
 	for _, file := range files {
 		req := cuiStoredRequest{}
@@ -57,12 +67,10 @@ func setupRequestHistory(cui *cuiApp) error {
 
 		// TODO: we could do a version check here to make sure that
 		// we can hndle the format
-
-		text := fmt.Sprintf("%s: %s", req.Method, req.URL)
-		second := fmt.Sprintf("%d %s", req.StatusCode, timeOutput(req.Timestamp))
-
-		cui.RequestHistory.InsertItem(-1, text, second, 0, nil)
+		insertHistoryItem(&req, cui)
 	}
+
+	cui.RequestHistory.SetCurrentItem(0)
 
 	return nil
 }
