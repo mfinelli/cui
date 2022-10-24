@@ -76,7 +76,7 @@ var commonHeaderKeys = []string{
 	"X-Request-ID",
 }
 
-var commonHeaderValues = []string{
+var commonHeaderContentTypes = []string{
 	"application/json",
 	"text/plain",
 	"application/javascript",

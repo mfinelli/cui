@@ -144,11 +144,14 @@ func main() {
 	})
 	cui.RequestHeaderValue.SetLabel("Value: ")
 	cui.RequestHeaderValue.SetAutocompleteFunc(func(currentText string) (entries []string) {
+		if !strings.EqualFold("Content-Type", cui.RequestHeaderKey.GetText()) {
+			return
+		}
 		if len(currentText) == 0 {
 			return
 		}
 
-		for _, word := range commonHeaderValues {
+		for _, word := range commonHeaderContentTypes {
 			if strings.HasPrefix(strings.ToLower(word), strings.ToLower(currentText)) {
 				entries = append(entries, word)
 			}
