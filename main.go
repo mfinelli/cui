@@ -143,6 +143,26 @@ func main() {
 		return
 	})
 	cui.RequestHeaderValue.SetLabel("Value: ")
+	cui.RequestHeaderValue.SetAutocompleteFunc(func(currentText string) (entries []string) {
+		if !strings.EqualFold("Content-Type", cui.RequestHeaderKey.GetText()) {
+			return
+		}
+		if len(currentText) == 0 {
+			return
+		}
+
+		for _, word := range commonHeaderContentTypes {
+			if strings.HasPrefix(strings.ToLower(word), strings.ToLower(currentText)) {
+				entries = append(entries, word)
+			}
+		}
+
+		if len(entries) <= 1 {
+			entries = nil
+		}
+
+		return
+	})
 	cui.RequestParameterKey.SetLabel("Key: ")
 	cui.RequestParameterValue.SetLabel("Value: ")
 
