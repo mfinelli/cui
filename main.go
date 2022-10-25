@@ -147,6 +147,7 @@ func main() {
 		if !strings.EqualFold("Content-Type", cui.RequestHeaderKey.GetText()) {
 			return
 		}
+
 		if len(currentText) == 0 {
 			return
 		}
