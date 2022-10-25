@@ -1,6 +1,6 @@
 # cui changelog
 
-## unreleased
+## v0.3.0 (2022/10/25)
 
 - Make request time in history view relative
 - Add autocomplete for content-type header (#5, #14: @DataKhukhua)

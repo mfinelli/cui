@@ -29,7 +29,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-const version = "0.2.0"
+const version = "0.3.0"
 
 type cuiApp struct {
 	Main *tview.Flex

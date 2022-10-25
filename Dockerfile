@@ -10,7 +10,7 @@ RUN make
 FROM alpine
 
 LABEL org.opencontainers.image.title=cui
-LABEL org.opencontainers.image.version=v0.2.0
+LABEL org.opencontainers.image.version=v0.3.0
 LABEL org.opencontainers.image.description="http request/response tui"
 LABEL org.opencontainers.image.url=https://github.com/mfinelli/cui
 LABEL org.opencontainers.image.source=https://github.com/mfinelli/cui
