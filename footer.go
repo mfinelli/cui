@@ -22,36 +22,39 @@ import (
 
 func setInstructions(cui *cuiApp, instr string) {
 	if instr == "RequestHistory" {
-		cui.Footer.SetText(" (esc) done  (enter) load  (↑/↓) navigate  (d) delete)")
+		cui.FooterInstruction.SetText(" (esc) done  (enter) load  (↑/↓) navigate  (d) delete)")
 	} else if instr == "MethodDropdown" {
-		cui.Footer.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
+		cui.FooterInstruction.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
 	} else if instr == "RequestKindDropdown" {
-		cui.Footer.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
+		cui.FooterInstruction.SetText(" (esc) cancel  (enter) confirm  (↑/↓) navigate")
 	} else if instr == "UrlInput" {
-		cui.Footer.SetText(" (enter) finish entering text")
+		cui.FooterInstruction.SetText(" (enter) finish entering text")
 	} else if instr == "ResponseBody" {
-		cui.Footer.SetText(" (esc) done  (h/j/k/l) navigate  (s) save response body to file  (t) response headers")
+		cui.FooterInstruction.SetText(" (esc) done  (h/j/k/l) navigate  (s) save response body to file  (t) response headers")
 	} else if instr == "ResponseHeaders" {
-		cui.Footer.SetText(" (esc) done  (t) response body")
+		cui.FooterInstruction.SetText(" (esc) done  (t) response body")
 	} else if instr == "RequestBodyTextarea" {
-		cui.Footer.SetText(" (esc) done  (crtl^k) set kind  (ctrl^h) edit headers (ctrl^p) edit query parameters (ctrl^e) edit in $EDITOR")
+		cui.FooterInstruction.SetText(" (esc) done  (crtl^k) set kind  (ctrl^h) edit headers (ctrl^p) edit query parameters (ctrl^e) edit in $EDITOR")
 	} else if instr == "RequestBodyFormdata" {
-		cui.Footer.SetText(" TODO")
+		cui.FooterInstruction.SetText(" TODO")
 	} else if instr == "RequestHeaders" {
-		cui.Footer.SetText(" (esc) done  (↑/↓) cycle headers  (a) add new header  (d) delete selected header  (b) edit request body  (p) edit query parameters")
+		cui.FooterInstruction.SetText(" (esc) done  (↑/↓) cycle headers  (a) add new header  (d) delete selected header  (b) edit request body  (p) edit query parameters")
 	} else if instr == "RequestHeaderAdd" {
-		cui.Footer.SetText(" (esc) cancel  (enter) done  (tab) cycle key/value")
+		cui.FooterInstruction.SetText(" (esc) cancel  (enter) done  (tab) cycle key/value")
 	} else if instr == "RequestParameters" {
-		cui.Footer.SetText(" (esc) done  (a) add query parameter  (d) deleted selected parameter  (b) edit request body  (h) edit headers")
-	} else {
+		cui.FooterInstruction.SetText(" (esc) done  (a) add query parameter  (d) deleted selected parameter  (b) edit request body  (h) edit headers")
+	} else if instr == "SaveResponse" {
+		cui.FooterInstruction.SetText(" (esc) cancel  (enter) done ")
+
+	}else {
 		if instr != "" {
 			log.Printf("Couldn't find instructions for '%s'\n", instr)
 		}
 
 		if cui.ViewHasResponse {
-			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (r) focus response  (h) history  (c) clear")
+			cui.FooterInstruction.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (r) focus response  (h) history  (c) clear")
 		} else {
-			cui.Footer.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) history  (c) clear")
+			cui.FooterInstruction.SetText(" (q) quit  (enter) send request  (m) set method  (u) set url  (e) edit request  (h) history  (c) clear")
 		}
 	}
 }

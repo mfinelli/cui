@@ -32,9 +32,10 @@ import (
 const version = "0.2.0"
 
 type cuiApp struct {
-	Main *tview.Flex
-
-	Footer *tview.TextView
+	Main              *tview.Flex
+	Footer            *tview.Flex
+	FooterInstruction *tview.TextView
+	FooterInput       *tview.InputField
 
 	MethodDropdown *tview.DropDown
 	UrlInput       *tview.InputField
@@ -95,10 +96,15 @@ func main() {
 	app := tview.NewApplication()
 
 	cui := cuiApp{
-		Main:                  tview.NewFlex(),
-		Footer:                tview.NewTextView(),
-		MethodDropdown:        tview.NewDropDown(),
-		UrlInput:              tview.NewInputField(),
+		Main: tview.NewFlex(),
+
+		Footer:            tview.NewFlex(),
+		FooterInstruction: tview.NewTextView(),
+		FooterInput:       tview.NewInputField(),
+
+		MethodDropdown: tview.NewDropDown(),
+		UrlInput:       tview.NewInputField(),
+
 		Request:               tview.NewFlex(),
 		RequestKindDropdown:   tview.NewDropDown(),
 		RequestBody:           tview.NewTextArea(),
@@ -110,14 +116,15 @@ func main() {
 		RequestParameterKey:   tview.NewInputField(),
 		RequestParameterValue: tview.NewInputField(),
 		RequestHistory:        tview.NewList(),
-		Response:              tview.NewFlex(),
-		ResponseStatus:        tview.NewTextView(),
-		ResponseBody:          tview.NewTextView(),
-		ResponseHeaders:       tview.NewTable(),
-		ViewHasResponse:       false,
-		ViewResponse:          "body",
-		ViewRequest:           "RequestBody",
-		ViewRequestInputType:  "Textarea",
+
+		Response:             tview.NewFlex(),
+		ResponseStatus:       tview.NewTextView(),
+		ResponseBody:         tview.NewTextView(),
+		ResponseHeaders:      tview.NewTable(),
+		ViewHasResponse:      false,
+		ViewResponse:         "body",
+		ViewRequest:          "RequestBody",
+		ViewRequestInputType: "Textarea",
 	}
 
 	cui.MethodDropdown.SetOptions(httpMethods, nil)
@@ -179,6 +186,10 @@ func main() {
 
 	req := cuiRequest{}
 	initRequest(app, &cui, &req, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
+
+	cui.Footer.SetDirection(tview.FlexRow).AddItem(
+		cui.FooterInstruction, 1, 0, false).
+		AddItem(cui.FooterInput.SetLabel("filename: "), 1, 0, false)
 
 	cui.Main.SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
@@ -261,6 +272,7 @@ func main() {
 				cui.ViewResponse = "body"
 				setInstructions(&cui, "ResponseBody")
 				app.SetFocus(cui.Response)
+
 			} else if focus == cui.RequestHeaderValue || focus == cui.RequestHeaderKey {
 				addHeader(&cui, &req)
 				setInstructions(&cui, cui.ViewRequest)
@@ -271,11 +283,32 @@ func main() {
 				setInstructions(&cui, cui.ViewRequest)
 				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+			} else if focus == cui.FooterInput {
+				filePath := cui.FooterInput.GetText()
+				responseBody := cui.ResponseBody.GetText(true)
+				err := SaveResponseFile(filePath, responseBody)
+				if err != nil {
+					app.SetFocus(cui.RequestHistory)
+				}
+				cui.Footer.RemoveItem(cui.FooterInput)
+
+				app.SetFocus(cui.ResponseBody)
+				cui.Footer.AddItem(
+					cui.FooterInput, 0 , 1, false)
+
+				setInstructions(&cui, "ResponseBody")
 			}
 		} else if event.Key() == tcell.KeyEscape {
 			if focus == cui.RequestHistory || focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
 				setInstructions(&cui, "")
+
 				app.SetFocus(cui.Main)
+			} else if focus == cui.FooterInput {
+				cui.Footer.RemoveItem(cui.FooterInput)
+				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false).AddItem(cui.FooterInput, 1, 0, false)
+				app.SetFocus(cui.ResponseBody)
+				// setInstructions(&cui, "ResponseBody")
+
 			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
 				setInstructions(&cui, "RequestHeaders")
 				setEditHeadersPlain(&cui, &req)
@@ -425,6 +458,16 @@ func main() {
 				app.SetFocus(cui.UrlInput)
 				return nil // prevent "u" from being entered
 			}
+		} else if event.Rune() == 115 { // s
+			if focus == cui.ResponseBody {
+				cui.Footer.RemoveItem(cui.FooterInstruction)
+				// (cui.FooterInstruction)
+				app.SetFocus(cui.Footer.GetItem(0))
+
+				// app.SetFocus(cui.FooterInput)
+
+			}
+
 		}
 
 		return event
