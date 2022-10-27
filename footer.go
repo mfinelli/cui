@@ -46,7 +46,10 @@ func setInstructions(cui *cuiApp, instr string) {
 	} else if instr == "SaveResponse" {
 		cui.FooterInstruction.SetText(" (esc) cancel  (enter) done ")
 
-	}else {
+	} else if instr == "FileExists" {
+		cui.FooterInstruction.SetText("(!) File With this name already  exists (r) replace (esc) cancel")
+
+	} else {
 		if instr != "" {
 			log.Printf("Couldn't find instructions for '%s'\n", instr)
 		}

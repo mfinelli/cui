@@ -17,6 +17,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -65,6 +66,7 @@ type cuiApp struct {
 }
 
 func main() {
+
 	// no help, because this is a hidden debug feature
 	serve := flag.Bool("server", false, "start simple echo dev server")
 	flag.Parse()
@@ -188,8 +190,7 @@ func main() {
 	initRequest(app, &cui, &req, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
 
 	cui.Footer.SetDirection(tview.FlexRow).AddItem(
-		cui.FooterInstruction, 1, 0, false).
-		AddItem(cui.FooterInput.SetLabel("filename: "), 1, 0, false)
+		cui.FooterInstruction, 1, 0, false)
 
 	cui.Main.SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
@@ -283,31 +284,38 @@ func main() {
 				setInstructions(&cui, cui.ViewRequest)
 				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+
 			} else if focus == cui.FooterInput {
+
 				filePath := cui.FooterInput.GetText()
 				responseBody := cui.ResponseBody.GetText(true)
 				err := SaveResponseFile(filePath, responseBody)
-				if err != nil {
-					app.SetFocus(cui.RequestHistory)
+				if errors.Is(err, os.ErrExist) {
+					cui.Footer.RemoveItem(cui.FooterInput)
+					cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
+					setInstructions(&cui, "FileExists")
+					app.SetFocus(cui.Footer)
+
+					return nil
 				}
+
 				cui.Footer.RemoveItem(cui.FooterInput)
+				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
 
-				app.SetFocus(cui.ResponseBody)
-				cui.Footer.AddItem(
-					cui.FooterInput, 0 , 1, false)
-
-				setInstructions(&cui, "ResponseBody")
 			}
 		} else if event.Key() == tcell.KeyEscape {
 			if focus == cui.RequestHistory || focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
 				setInstructions(&cui, "")
 
 				app.SetFocus(cui.Main)
+			} else if focus == cui.Footer {
+				setInstructions(&cui, "ResponseBody")
+				app.SetFocus(cui.ResponseBody)
+
 			} else if focus == cui.FooterInput {
 				cui.Footer.RemoveItem(cui.FooterInput)
 				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false).AddItem(cui.FooterInput, 1, 0, false)
 				app.SetFocus(cui.ResponseBody)
-				// setInstructions(&cui, "ResponseBody")
 
 			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
 				setInstructions(&cui, "RequestHeaders")
@@ -460,12 +468,10 @@ func main() {
 			}
 		} else if event.Rune() == 115 { // s
 			if focus == cui.ResponseBody {
-				cui.Footer.RemoveItem(cui.FooterInstruction)
-				// (cui.FooterInstruction)
-				app.SetFocus(cui.Footer.GetItem(0))
-
-				// app.SetFocus(cui.FooterInput)
-
+				cui.Footer.Clear()
+				cui.Footer.AddItem(cui.FooterInput.SetLabel("filename: "), 1, 0, false)
+				app.SetFocus(cui.FooterInput)
+				return nil
 			}
 
 		}
