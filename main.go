@@ -301,6 +301,7 @@ func main() {
 
 				cui.Footer.RemoveItem(cui.FooterInput)
 				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
+				app.SetFocus(cui.ResponseBody)
 
 			}
 		} else if event.Key() == tcell.KeyEscape {
