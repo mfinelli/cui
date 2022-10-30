@@ -111,7 +111,6 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 		return err
 	}
 
-
 	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d,", res.StatusCode))
 	cui.ResponseSize.SetText(fmt.Sprintf("Response Size: %d", len(body)))
 
