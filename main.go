@@ -329,7 +329,7 @@ func main() {
 				if app.Suspend(func() {
 					d, err := EditRequestInEditor(currentOption, currText, editor)
 					if err != nil {
-						return
+						panic(err)
 					}
 					editedText = string(d)
 
