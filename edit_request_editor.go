@@ -1,3 +1,19 @@
+// cui: http request/response tui
+// Copyright 2022 Mario Finelli
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -13,30 +29,30 @@ func EditRequestInEditor(currentOption string, tempText string, editor string) (
 		tmpFileName = "editRequest*.json"
 	}
 
-	tmpFile, errTemp := os.CreateTemp("", tmpFileName)
+	tmpFile, err := os.CreateTemp("", tmpFileName)
 
-	if errTemp != nil {
-		return nil, errTemp
+	if err != nil {
+		return nil, err
 	}
 	defer os.Remove(tmpFile.Name())
 
-	_, errWrite := tmpFile.WriteString(tempText)
-	if errWrite != nil {
-		return nil, errWrite
+	_, err = tmpFile.WriteString(tempText)
+	if err != nil {
+		return nil, err
 	}
 
 	cmd := exec.Command(editor, tmpFile.Name())
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 
-	errRun := cmd.Run()
-	if errRun != nil {
-		return nil, errRun
+	err = cmd.Run()
+	if err != nil {
+		return nil, err
 	}
 
-	inputText, errReadTemp := os.ReadFile(tmpFile.Name())
-	if errReadTemp != nil {
-		return nil, errReadTemp
+	inputText, err := os.ReadFile(tmpFile.Name())
+	if err != nil {
+		return nil, err
 	}
 
 	return inputText, nil
