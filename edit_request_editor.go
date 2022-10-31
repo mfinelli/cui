@@ -34,7 +34,6 @@ func EditRequestInEditor(currentOption string, tempText string, editor string) (
 		return nil, errRun
 	}
 
-	// if cmd.ProcessState.Exited() {
 	inputText, errReadTemp := os.ReadFile(tmpFile.Name())
 	if errReadTemp != nil {
 		return nil, errReadTemp

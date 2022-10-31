@@ -321,13 +321,18 @@ func main() {
 
 				_, currentOption := cui.RequestKindDropdown.GetCurrentOption()
 
-				editedText, err := EditRequestInEditor(currentOption, currText, editor)
-				if err != nil {
-					return nil
+				var editedText string
+
+				if app.Suspend(func() {
+					d, _ := EditRequestInEditor(currentOption, currText, editor)
+					editedText = string(d)
+
+				}) {
+
+					cui.RequestBody.SetText(string(editedText), true)
+					app.Sync()
 
 				}
-				cui.RequestBody.SetText(string(editedText), true)
-				app.Sync()
 				app.SetFocus(cui.RequestBody)
 
 			}
