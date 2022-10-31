@@ -1,5 +1,9 @@
 # cui changelog
 
+## unreleased
+
+- Add response size in bytes to status code line (#2, #18: @DataKhukhua)
+
 ## v0.3.0 (2022/10/25)
 
 - Make request time in history view relative
