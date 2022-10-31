@@ -120,16 +120,15 @@ func main() {
 		RequestParameterValue: tview.NewInputField(),
 		RequestHistory:        tview.NewList(),
 
-		Response:              tview.NewFlex(),
-		ResponseStatus:        tview.NewTextView(),
-		ResponseSize:          tview.NewTextView(),
-		ResponseBody:          tview.NewTextView(),
-		ResponseHeaders:       tview.NewTable(),
-		ViewHasResponse:       false,
-		ViewResponse:          "body",
-		ViewRequest:           "RequestBody",
-		ViewRequestInputType:  "Textarea",
-
+		Response:             tview.NewFlex(),
+		ResponseStatus:       tview.NewTextView(),
+		ResponseSize:         tview.NewTextView(),
+		ResponseBody:         tview.NewTextView(),
+		ResponseHeaders:      tview.NewTable(),
+		ViewHasResponse:      false,
+		ViewResponse:         "body",
+		ViewRequest:          "RequestBody",
+		ViewRequestInputType: "Textarea",
 	}
 
 	cui.MethodDropdown.SetOptions(httpMethods, nil)
@@ -499,6 +498,21 @@ func main() {
 				app.SetFocus(cui.UrlInput)
 				return nil // prevent "u" from being entered
 			}
+		} else if event.Rune() == 119 { // w
+			if focus == cui.Footer {
+				cui.ViewResponse = "body"
+				setInstructions(&cui, "ResponseBody")
+
+				filePath := cui.FooterInput.GetText()
+				responseBody := cui.ResponseBody.GetText(true)
+				err := ReplaceSaveResponseFile(filePath, responseBody)
+				if err != nil {
+					panic(err)
+				}
+
+				app.SetFocus(cui.ResponseBody)
+			}
+
 		} else if event.Rune() == 115 { // s
 			if focus == cui.ResponseBody {
 				cui.Footer.Clear()
