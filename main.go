@@ -54,6 +54,7 @@ type cuiApp struct {
 
 	Response        *tview.Flex
 	ResponseStatus  *tview.TextView
+	ResponseSize    *tview.TextView
 	ResponseBody    *tview.TextView
 	ResponseHeaders *tview.Table
 
@@ -112,6 +113,7 @@ func main() {
 		RequestHistory:        tview.NewList(),
 		Response:              tview.NewFlex(),
 		ResponseStatus:        tview.NewTextView(),
+		ResponseSize:          tview.NewTextView(),
 		ResponseBody:          tview.NewTextView(),
 		ResponseHeaders:       tview.NewTable(),
 		ViewHasResponse:       false,
@@ -173,9 +175,13 @@ func main() {
 		AddItem(cui.MethodDropdown, 10, 0, false).
 		AddItem(cui.UrlInput, 0, 1, false)
 
+	responseStatusAndSize := tview.NewFlex().
+		AddItem(cui.ResponseStatus, 1, 0, false).
+		AddItem(cui.ResponseSize, 1, 1, false)
+
 	cui.Response.SetBorder(true).SetTitle(" Response ")
 	cui.Response.SetDirection(tview.FlexRow).
-		AddItem(cui.ResponseStatus, 1, 0, false).
+		AddItem(responseStatusAndSize, 1, 0, false).
 		AddItem(cui.ResponseBody, 0, 1, true)
 
 	cui.Request.SetDirection(tview.FlexRow).
@@ -435,8 +441,12 @@ func main() {
 				cui.ViewResponse = "body"
 				setInstructions(&cui, "ResponseBody")
 
+				responseStatusAndSize := tview.NewFlex().
+					AddItem(cui.ResponseStatus, 13, 0, false).
+					AddItem(cui.ResponseSize, 0, 1, false)
+
 				cui.Response.Clear().SetDirection(tview.FlexRow).
-					AddItem(cui.ResponseStatus, 1, 0, false).
+					AddItem(responseStatusAndSize, 1, 0, false).
 					AddItem(cui.ResponseBody, 0, 1, true)
 				app.SetFocus(cui.Response)
 			}
