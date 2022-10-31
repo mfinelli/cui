@@ -324,7 +324,10 @@ func main() {
 				var editedText string
 
 				if app.Suspend(func() {
-					d, _ := EditRequestInEditor(currentOption, currText, editor)
+					d, errEditor := EditRequestInEditor(currentOption, currText, editor)
+					if errEditor != nil {
+						return
+					}
 					editedText = string(d)
 
 				}) {
