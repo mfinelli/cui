@@ -314,6 +314,24 @@ func main() {
 				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
 			}
+		} else if event.Key() == tcell.KeyCtrlE {
+			if focus == cui.RequestBody {
+				editor := os.Getenv("EDITOR")
+				currText := cui.RequestBody.GetText()
+
+				_, currentOption := cui.RequestKindDropdown.GetCurrentOption()
+
+				editedText, err := EditRequestInEditor(currentOption, currText, editor)
+				if err != nil {
+					return nil
+
+				}
+				cui.RequestBody.SetText(string(editedText), true)
+				app.Sync()
+				app.SetFocus(cui.RequestBody)
+
+			}
+
 		} else if event.Rune() == 97 { // a
 			if focus == cui.RequestHeaders {
 				setInstructions(&cui, "RequestHeaderAdd")
