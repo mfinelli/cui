@@ -317,6 +317,9 @@ func main() {
 		} else if event.Key() == tcell.KeyCtrlE {
 			if focus == cui.RequestBody {
 				editor := os.Getenv("EDITOR")
+				if editor == "" {
+					return nil
+				}
 				currText := cui.RequestBody.GetText()
 
 				_, currentOption := cui.RequestKindDropdown.GetCurrentOption()
