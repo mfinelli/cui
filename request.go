@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	// "log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -110,7 +109,8 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 		return err
 	}
 
-	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d", res.StatusCode))
+	cui.ResponseStatus.SetText(fmt.Sprintf("Status: %d,", res.StatusCode))
+	cui.ResponseSize.SetText(fmt.Sprintf("Response Size: %d bytes", len(body)))
 
 	cui.ResponseHeaders.SetCell(0, 0, tview.NewTableCell("Header"))
 	cui.ResponseHeaders.SetCell(0, 1, tview.NewTableCell("Value"))

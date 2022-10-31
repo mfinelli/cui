@@ -29,12 +29,17 @@ func initRequest(app *tview.Application, cui *cuiApp, req *cuiRequest, method, u
 
 	cui.ViewHasResponse = false
 	cui.ResponseStatus.SetText("")
+	cui.ResponseSize.SetText("")
 	cui.ResponseBody.Clear()
 	cui.ResponseHeaders.Clear()
 
+	responseStatusAndSize := tview.NewFlex().
+		AddItem(cui.ResponseStatus, 13, 0, false).
+		AddItem(cui.ResponseSize, 0, 1, false)
+
 	cui.ViewResponse = "body"
 	cui.Response.Clear().SetDirection(tview.FlexRow).
-		AddItem(cui.ResponseStatus, 1, 0, false).
+		AddItem(responseStatusAndSize, 1, 0, false).
 		AddItem(cui.ResponseBody, 0, 1, true)
 
 	cui.ViewRequest = "RequestBody"

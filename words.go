@@ -75,3 +75,15 @@ var commonHeaderKeys = []string{
 	"X-Csrf-Token",
 	"X-Request-ID",
 }
+
+var commonHeaderContentTypes = []string{
+	"application/javascript",
+	"application/json",
+	"application/x-www-form-urlencoded",
+	"application/xml",
+	"text/css",
+	"text/csv",
+	"text/html",
+	"text/plain",
+	"text/xml",
+}

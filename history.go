@@ -28,6 +28,8 @@ import (
 	"github.com/rivo/tview"
 )
 
+const weekInSeconds = 604800
+
 func insertHistoryItem(app *tview.Application, store *cuiStoredRequest, cui *cuiApp, req *cuiRequest) {
 	text := fmt.Sprintf("%s: %s", store.Method, store.URL)
 	second := fmt.Sprintf("%d %s", store.StatusCode, timeOutput(store.Timestamp))
@@ -82,9 +84,18 @@ func setupRequestHistory(app *tview.Application, cui *cuiApp, cuiReq *cuiRequest
 }
 
 func timeOutput(timestamp int64) string {
-	// TODO if it's today just show the time (e.g., 12:30)
-	// if it's more than today but the same week show the day (e.g., Mon 19:00)
-	// if it's more than a week show the full date (e.g., 1 Feb 6:00)
 	t := time.Unix(timestamp, 0)
-	return t.Format(time.UnixDate)
+
+	todayYear, todayMonth, todayDay := time.Now().Date()
+
+	if t.Day() == todayDay && t.Month() == todayMonth && t.Year() == todayYear {
+		return fmt.Sprintf("Today %s", t.Format("15:04"))
+	}
+
+	oneWeekAgo := time.Now().Unix() - weekInSeconds
+	if timestamp > oneWeekAgo {
+		return t.Format("Mon 15:04")
+	}
+
+	return t.Format("02 Jan 15:04")
 }
