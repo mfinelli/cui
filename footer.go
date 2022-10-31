@@ -47,7 +47,7 @@ func setInstructions(cui *cuiApp, instr string) {
 		cui.FooterInstruction.SetText(" (esc) cancel  (enter) done ")
 
 	} else if instr == "FileExists" {
-		cui.FooterInstruction.SetText("(!) File With this name already  exists (r) replace (esc) cancel")
+		cui.FooterInstruction.SetText("(!) File With this name already  exists (w) replace (esc) cancel")
 
 	} else {
 		if instr != "" {
