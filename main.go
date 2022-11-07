@@ -313,10 +313,7 @@ func main() {
 				app.SetFocus(cui.Request)
 
 			} else if focus == cui.FooterInput {
-
-				filePath := cui.FooterInput.GetText()
-				responseBody := cui.ResponseBody.GetText(true)
-				err := SaveResponseFile(filePath, responseBody)
+				err := SaveResponseFile(&cui)
 				if errors.Is(err, os.ErrExist) {
 					cui.Footer.RemoveItem(cui.FooterInput)
 					cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
@@ -502,10 +499,7 @@ func main() {
 			if focus == cui.Footer {
 				cui.ViewResponse = "body"
 				setInstructions(&cui, "ResponseBody")
-
-				filePath := cui.FooterInput.GetText()
-				responseBody := cui.ResponseBody.GetText(true)
-				err := ReplaceSaveResponseFile(filePath, responseBody)
+				err := ReplaceSaveResponseFile(&cui)
 				if err != nil {
 					panic(err)
 				}

@@ -22,13 +22,15 @@ import (
 	"strings"
 )
 
-func SaveResponseFile(filePath string, responseBody string) error {
+func SaveResponseFile(cui *cuiApp) error {
 
-	var absFilePath string = filePath
+	absFilePath := cui.FooterInput.GetText()
+	responseBody := cui.ResponseBody.GetText(true)
 
-	if strings.HasPrefix(filePath, "~/") {
+
+	if strings.HasPrefix(absFilePath, "~/") {
 		dirname, _ := os.UserHomeDir()
-		absFilePath = filepath.Join(dirname, filePath[2:])
+		absFilePath = filepath.Join(dirname, absFilePath[2:])
 
 	}
 
@@ -55,13 +57,14 @@ func SaveResponseFile(filePath string, responseBody string) error {
 
 }
 
-func ReplaceSaveResponseFile(filePath string, responseBody string) error {
+func ReplaceSaveResponseFile(cui *cuiApp) error {
 
-	var absFilePath string = filePath
+	absFilePath := cui.FooterInput.GetText()
+	responseBody := cui.ResponseBody.GetText(true)
 
-	if strings.HasPrefix(filePath, "~/") {
+	if strings.HasPrefix(absFilePath, "~/") {
 		dirname, _ := os.UserHomeDir()
-		absFilePath = filepath.Join(dirname, filePath[2:])
+		absFilePath = filepath.Join(dirname, absFilePath[2:])
 	}
 
 	f, err := os.OpenFile(absFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
