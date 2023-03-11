@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,10 +45,8 @@ func setInstructions(cui *cuiApp, instr string) {
 		cui.FooterInstruction.SetText(" (esc) done  (a) add query parameter  (d) deleted selected parameter  (b) edit request body  (h) edit headers")
 	} else if instr == "SaveResponse" {
 		cui.FooterInstruction.SetText(" (esc) cancel  (enter) done ")
-
 	} else if instr == "FileExists" {
 		cui.FooterInstruction.SetText("(!) File With this name already  exists (w) replace (esc) cancel")
-
 	} else {
 		if instr != "" {
 			log.Printf("Couldn't find instructions for '%s'\n", instr)

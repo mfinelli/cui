@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,10 +23,8 @@ import (
 )
 
 func SaveResponseFile(cui *cuiApp) error {
-
 	absFilePath := cui.FooterInput.GetText()
 	responseBody := cui.ResponseBody.GetText(true)
-
 
 	if strings.HasPrefix(absFilePath, "~/") {
 		dirname, _ := os.UserHomeDir()
@@ -54,11 +52,9 @@ func SaveResponseFile(cui *cuiApp) error {
 	}
 
 	return nil
-
 }
 
 func ReplaceSaveResponseFile(cui *cuiApp) error {
-
 	absFilePath := cui.FooterInput.GetText()
 	responseBody := cui.ResponseBody.GetText(true)
 
@@ -67,7 +63,7 @@ func ReplaceSaveResponseFile(cui *cuiApp) error {
 		absFilePath = filepath.Join(dirname, absFilePath[2:])
 	}
 
-	f, err := os.OpenFile(absFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(absFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
@@ -79,5 +75,4 @@ func ReplaceSaveResponseFile(cui *cuiApp) error {
 	}
 
 	return nil
-
 }

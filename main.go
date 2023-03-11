@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ type cuiApp struct {
 }
 
 func main() {
-
 	// no help, because this is a hidden debug feature
 	serve := flag.Bool("server", false, "start simple echo dev server")
 	flag.Parse()
@@ -88,7 +87,7 @@ func main() {
 		panic(err)
 	}
 
-	logfile, err := os.OpenFile(filepath.Join(cacheDir, "cui.log"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	logfile, err := os.OpenFile(filepath.Join(cacheDir, "cui.log"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
 		panic(err)
 	}
@@ -397,7 +396,6 @@ func main() {
 						panic(err)
 					}
 					editedText = string(d)
-
 				}) {
 
 					cui.RequestBody.SetText(string(editedText), true)
@@ -407,7 +405,6 @@ func main() {
 				app.SetFocus(cui.RequestBody)
 
 			}
-
 		} else if event.Rune() == 97 { // a
 			if focus == cui.RequestHeaders {
 				setInstructions(&cui, "RequestHeaderAdd")
@@ -534,7 +531,6 @@ func main() {
 
 				app.SetFocus(cui.ResponseBody)
 			}
-
 		} else if event.Rune() == 115 { // s
 			if focus == cui.ResponseBody {
 				cui.Footer.Clear()
@@ -542,7 +538,6 @@ func main() {
 				app.SetFocus(cui.FooterInput)
 				return nil
 			}
-
 		}
 
 		return event

@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import (
 )
 
 func EditRequestInEditor(currentOption string, tempText string, editor string) ([]byte, error) {
-
 	tmpFileName := "editRequest"
 
 	if currentOption == "JSON" {
@@ -30,7 +29,6 @@ func EditRequestInEditor(currentOption string, tempText string, editor string) (
 	}
 
 	tmpFile, err := os.CreateTemp("", tmpFileName)
-
 	if err != nil {
 		return nil, err
 	}
@@ -56,5 +54,4 @@ func EditRequestInEditor(currentOption string, tempText string, editor string) (
 	}
 
 	return inputText, nil
-
 }
