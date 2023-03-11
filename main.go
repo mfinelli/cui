@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -32,9 +33,10 @@ import (
 const version = "0.3.0"
 
 type cuiApp struct {
-	Main *tview.Flex
-
-	Footer *tview.TextView
+	Main              *tview.Flex
+	Footer            *tview.Flex
+	FooterInstruction *tview.TextView
+	FooterInput       *tview.InputField
 
 	MethodDropdown *tview.DropDown
 	UrlInput       *tview.InputField
@@ -85,7 +87,7 @@ func main() {
 		panic(err)
 	}
 
-	logfile, err := os.OpenFile(filepath.Join(cacheDir, "cui.log"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	logfile, err := os.OpenFile(filepath.Join(cacheDir, "cui.log"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
 		panic(err)
 	}
@@ -96,10 +98,15 @@ func main() {
 	app := tview.NewApplication()
 
 	cui := cuiApp{
-		Main:                  tview.NewFlex(),
-		Footer:                tview.NewTextView(),
-		MethodDropdown:        tview.NewDropDown(),
-		UrlInput:              tview.NewInputField(),
+		Main: tview.NewFlex(),
+
+		Footer:            tview.NewFlex(),
+		FooterInstruction: tview.NewTextView(),
+		FooterInput:       tview.NewInputField(),
+
+		MethodDropdown: tview.NewDropDown(),
+		UrlInput:       tview.NewInputField(),
+
 		Request:               tview.NewFlex(),
 		RequestKindDropdown:   tview.NewDropDown(),
 		RequestBody:           tview.NewTextArea(),
@@ -207,6 +214,9 @@ func main() {
 	req := cuiRequest{}
 	initRequest(app, &cui, &req, http.MethodGet, "", "", make(map[string]string), make(map[string]string))
 
+	cui.Footer.SetDirection(tview.FlexRow).AddItem(
+		cui.FooterInstruction, 1, 0, false)
+
 	cui.Main.SetDirection(tview.FlexRow).
 		AddItem(header, 1, 0, false).
 		AddItem(inner, 0, 1, false).
@@ -288,6 +298,7 @@ func main() {
 				cui.ViewResponse = "body"
 				setInstructions(&cui, "ResponseBody")
 				app.SetFocus(cui.Response)
+
 			} else if focus == cui.RequestHeaderValue || focus == cui.RequestHeaderKey {
 				addHeader(&cui, &req)
 				setInstructions(&cui, cui.ViewRequest)
@@ -298,11 +309,37 @@ func main() {
 				setInstructions(&cui, cui.ViewRequest)
 				setEditParametersPlain(&cui, &req)
 				app.SetFocus(cui.Request)
+
+			} else if focus == cui.FooterInput {
+				err := SaveResponseFile(&cui)
+				if errors.Is(err, os.ErrExist) {
+					cui.Footer.RemoveItem(cui.FooterInput)
+					cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
+					setInstructions(&cui, "FileExists")
+					app.SetFocus(cui.Footer)
+
+					return nil
+				}
+
+				cui.Footer.RemoveItem(cui.FooterInput)
+				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false)
+				app.SetFocus(cui.ResponseBody)
+
 			}
 		} else if event.Key() == tcell.KeyEscape {
 			if focus == cui.RequestHistory || focus == cui.ResponseBody || focus == cui.ResponseHeaders || focus == cui.RequestBody || focus == cui.RequestHeaders || focus == cui.RequestParameters {
 				setInstructions(&cui, "")
+
 				app.SetFocus(cui.Main)
+			} else if focus == cui.Footer {
+				setInstructions(&cui, "ResponseBody")
+				app.SetFocus(cui.ResponseBody)
+
+			} else if focus == cui.FooterInput {
+				cui.Footer.RemoveItem(cui.FooterInput)
+				cui.Footer.AddItem(cui.FooterInstruction, 1, 0, false).AddItem(cui.FooterInput, 1, 0, false)
+				app.SetFocus(cui.ResponseBody)
+
 			} else if focus == cui.RequestHeaderKey || focus == cui.RequestHeaderValue {
 				setInstructions(&cui, "RequestHeaders")
 				setEditHeadersPlain(&cui, &req)
@@ -359,7 +396,6 @@ func main() {
 						panic(err)
 					}
 					editedText = string(d)
-
 				}) {
 
 					cui.RequestBody.SetText(string(editedText), true)
@@ -369,7 +405,6 @@ func main() {
 				app.SetFocus(cui.RequestBody)
 
 			}
-
 		} else if event.Rune() == 97 { // a
 			if focus == cui.RequestHeaders {
 				setInstructions(&cui, "RequestHeaderAdd")
@@ -484,6 +519,24 @@ func main() {
 				setInstructions(&cui, "UrlInput")
 				app.SetFocus(cui.UrlInput)
 				return nil // prevent "u" from being entered
+			}
+		} else if event.Rune() == 119 { // w
+			if focus == cui.Footer {
+				cui.ViewResponse = "body"
+				setInstructions(&cui, "ResponseBody")
+				err := ReplaceSaveResponseFile(&cui)
+				if err != nil {
+					panic(err)
+				}
+
+				app.SetFocus(cui.ResponseBody)
+			}
+		} else if event.Rune() == 115 { // s
+			if focus == cui.ResponseBody {
+				cui.Footer.Clear()
+				cui.Footer.AddItem(cui.FooterInput.SetLabel("filename: "), 1, 0, false)
+				app.SetFocus(cui.FooterInput)
+				return nil
 			}
 		}
 

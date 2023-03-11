@@ -4,6 +4,7 @@
 
 - Add response size in bytes to status code line (#2, #18: @DataKhukhua)
 - Allow editing the request body in an external editor (#9, #17: @DataKhukhua)
+- Allow saving the response body to a file (#10, #16: @DataKhukhua)
 
 ## v0.3.0 (2022/10/25)
 

@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(cacheDir, fmt.Sprintf("request-%d.json", store.Timestamp)), jsonBytes, 0644)
+	err = ioutil.WriteFile(filepath.Join(cacheDir, fmt.Sprintf("request-%d.json", store.Timestamp)), jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}
