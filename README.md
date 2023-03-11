@@ -45,7 +45,7 @@ agg cui.cast cui.gif
 
 ```
 cui: http request/response tui
-Copyright 2022 Mario Finelli
+Copyright 2022-2023 Mario Finelli
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
