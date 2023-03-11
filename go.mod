@@ -1,6 +1,6 @@
 module github.com/mfinelli/cui
 
-go 1.19
+go 1.20
 
 require (
 	github.com/alecthomas/chroma/v2 v2.3.0
