@@ -1,6 +1,6 @@
 # cui changelog
 
-## unreleased
+## v0.4.0 (2023/03/15)
 
 - Add response size in bytes to status code line (#2, #18: @DataKhukhua)
 - Allow editing the request body in an external editor (#9, #17: @DataKhukhua)
