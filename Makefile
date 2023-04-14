@@ -3,13 +3,25 @@ SOURCES := $(wildcard *.go)
 PREFIX := /usr/local
 DESTDIR :=
 
+LDFLAGS ?= -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now
+RELEASE_LDFLAGS ?= -linkmode=external -extldflags='${LDFLAGS}'
+
 all: cui
 
 clean:
-	rm -rf cui
+	rm -rf cui vendor
 
-cui: $(SOURCES)
-	go build -o $@ -mod=readonly -ldflags="-s -w" .
+cui: $(SOURCES) vendor
+	go build \
+		-buildmode=pie \
+		-trimpath \
+		-ldflags="$(RELEASE_LDFLAGS)" \
+		-mod=vendor \
+		-modcacherw \
+		-o $@ .
+
+vendor: go.sum
+	go mod vendor
 
 install:
 	install -Dm0755 cui "$(DESTDIR)$(PREFIX)/bin/cui"
@@ -22,4 +34,8 @@ uninstall:
 		"$(DESTDIR)$(PREFIX)/share/doc/cui" \
 		"$(DESTDIR)$(PREFIX)/share/man/man1/cui.1"
 
-.PHONY: all clean install uninstall
+test: cui vendor
+	go test -mod=vendor ./...
+	./cui -version
+
+.PHONY: all clean install test uninstall

@@ -2,7 +2,7 @@ FROM golang:1.19-alpine as source
 RUN apk add make
 WORKDIR /cui
 COPY . /cui
-RUN go mod vendor
+RUN make vendor
 
 FROM source as build
 RUN make

@@ -20,7 +20,7 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
-      - run: go mod vendor
+      - run: make vendor
       - run: |
           mkdir cui_${{ github.ref_name }}
           git archive HEAD | tar -x -C cui_${{ github.ref_name }}
@@ -31,7 +31,7 @@ jobs:
 
           for arch in amd64 arm64; do
             for os in darwin linux; do
-              GOOS=$os GOARCH=$arch make cui
+              RELEASE_LDFLAGS="-w -s" GOOS=$os GOARCH=$arch make cui
               mv cui cui_${{ github.ref_name }}_${os}_${arch}
               xz cui_${{ github.ref_name }}_${os}_${arch}
               gpg -ba cui_${{ github.ref_name }}_${os}_${arch}.xz

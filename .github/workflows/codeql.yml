@@ -16,6 +16,5 @@ jobs:
       - uses: github/codeql-action/init@v2
         with:
           languages: go
-      - run: go mod download
       - run: make
       - uses: github/codeql-action/analyze@v2
