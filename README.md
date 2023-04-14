@@ -29,8 +29,9 @@ cui -server
 
 ## releases
 
-Releases are automated, simply edit the version in `Dockerfile` and `main.go`,
-and then make and push the relevant git tag.
+Releases are automated, simply edit the version by running `version.bash` with
+the desired version (without the `v` prefix) and then make and push the
+relevant git tag (this time _with_ the `v` prefix).
 
 ### terminal video
 
