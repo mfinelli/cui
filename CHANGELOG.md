@@ -2,8 +2,9 @@
 
 ## unreleased
 
+- Update to go version 1.20
 - Update dependencies
-- Update makefile
+- Update dockerfile and makefile
 - Add `-version` option
 
 ## v0.4.0 (2023/03/15)

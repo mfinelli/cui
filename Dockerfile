@@ -1,11 +1,15 @@
-FROM golang:1.19-alpine as source
+FROM golang:1.20-alpine as source
 RUN apk add make
 WORKDIR /cui
 COPY . /cui
 RUN make vendor
 
 FROM source as build
+RUN apk add fortify-headers gcc libc-dev
 RUN make
+
+FROM build as test
+RUN make test
 
 FROM alpine
 
