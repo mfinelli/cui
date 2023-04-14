@@ -69,7 +69,13 @@ type cuiApp struct {
 func main() {
 	// no help, because this is a hidden debug feature
 	serve := flag.Bool("server", false, "start simple echo dev server")
+	showVersion := flag.Bool("version", false, "show cui version")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("cui version v%s\n", version)
+		return
+	}
 
 	if *serve {
 		cuiDevServer(httpMethods)

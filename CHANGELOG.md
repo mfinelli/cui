@@ -1,5 +1,9 @@
 # cui changelog
 
+## unreleased
+
+- Add `-version` option
+
 ## v0.4.0 (2023/03/15)
 
 - Add response size in bytes to status code line (#2, #18: @DataKhukhua)
