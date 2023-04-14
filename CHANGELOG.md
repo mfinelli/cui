@@ -1,6 +1,6 @@
 # cui changelog
 
-## unreleased
+## v0.5.0 (2023/04/14)
 
 - Update to go version 1.20
 - Update dependencies
