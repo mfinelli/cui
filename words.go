@@ -1,5 +1,5 @@
 // cui: http request/response tui
-// Copyright 2022 Mario Finelli
+// Copyright 2022-2023 Mario Finelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ var requestKinds = []string{"Form Data", "JSON", "Raw"}
 
 var httpMethods = []string{
 	http.MethodDelete,
-	http.MethodHead,
 	http.MethodGet,
+	http.MethodHead,
 	http.MethodOptions,
 	http.MethodPatch,
 	http.MethodPost,
@@ -38,8 +38,8 @@ var commonHeaderKeys = []string{
 	"Accept-Charset",
 	"Accept-Encoding",
 	"Accept-Language",
-	"Access-Control-Request-Method",
 	"Access-Control-Request-Headers",
+	"Access-Control-Request-Method",
 	"Authorization",
 	"Cache-Control",
 	"Connection",
@@ -68,12 +68,12 @@ var commonHeaderKeys = []string{
 	"Transfer-Encoding",
 	"User-Agent",
 	"Via",
-	"X-Requested-With",
+	"X-Csrf-Token",
 	"X-Forwarded-For",
 	"X-Forwarded-Host",
 	"X-Forwarded-Proto",
-	"X-Csrf-Token",
 	"X-Request-ID",
+	"X-Requested-With",
 }
 
 var commonHeaderContentTypes = []string{
