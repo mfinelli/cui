@@ -3,7 +3,7 @@ module github.com/mfinelli/cui
 go 1.20
 
 require (
-	github.com/alecthomas/chroma/v2 v2.7.0
+	github.com/alecthomas/chroma/v2 v2.8.0
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/rivo/tview v0.0.0-20230406072732-e22ce9588bb4
