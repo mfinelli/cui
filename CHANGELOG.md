@@ -1,6 +1,6 @@
 # cui changelog
 
-## unreleased
+## v0.5.1 (2023/09/07)
 
 - Update dependencies
 - Update go version
