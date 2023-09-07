@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine as source
+FROM golang:1.21-alpine as source
 RUN apk add make
 WORKDIR /cui
 COPY . /cui
