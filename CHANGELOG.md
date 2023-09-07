@@ -1,5 +1,10 @@
 # cui changelog
 
+## unreleased
+
+- Update dependencies
+- Update go version
+
 ## v0.5.0 (2023/04/14)
 
 - Update to go version 1.20
