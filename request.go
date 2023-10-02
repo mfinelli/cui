@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -104,7 +103,7 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 	}
 
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
@@ -172,7 +171,7 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(cacheDir, fmt.Sprintf("request-%d.json", store.Timestamp)), jsonBytes, 0o644)
+	err = os.WriteFile(filepath.Join(cacheDir, fmt.Sprintf("request-%d.json", store.Timestamp)), jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}
