@@ -141,6 +141,9 @@ func sendRequest(app *tview.Application, req *cuiRequest, cui *cuiApp) error {
 		style := styles.Get("fruity")
 		formatter := formatters.Get("terminal")
 		iterator, err := lexer.Tokenise(nil, string(body))
+		if err != nil {
+			return err
+		}
 
 		w := tview.ANSIWriter(cui.ResponseBody)
 		err = formatter.Format(w, style, iterator)
