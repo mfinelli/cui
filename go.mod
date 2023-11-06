@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/alecthomas/chroma/v2 v2.9.1
 	github.com/gdamore/tcell/v2 v2.6.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/rivo/tview v0.0.0-20230916092115-0ad06c2ea3dd
 )
 
